@@ -8,13 +8,27 @@
 # "         |_|                                     "
 # Ascii art Big
 .onLoad <- function(libname, pkgname){
-  if(!reticulate::virtualenv_exists(envname = "LipRtPred")){
-    message("You are building python virtual environment LipRtPred...")
-    reticulate::install_python(version = "3.11")
-    reticulate::virtualenv_create(
-      envname = "LipRtPred",
-      version = "3.11",
-    )
+  # Install conda
+  conda_version <- tryCatch({
+    reticulate::conda_version()
+  }, error = function(e) {
+    NULL
+  })
+  if(is.null(conda_version)){
+    cat("Conda is not found!\n",
+        "Please install miniconda first!\n",
+        "https://www.anaconda.com/download/success",
+        sep = "")
+  }else{
+    cat("Conda is installed. Version: ", conda_version, "\n")
+    # LipRtPred environment
+    if(!reticulate::condaenv_exists("LipRtPred")){
+      cat("Create LipRtPred environment...")
+      reticulate::conda_create(envname = "LipRtPred", python_version = "3.11")
+      reticulate::py_install("rdkit", envname = "LipRtPred", pip = TRUE)
+    }
+    reticulate::use_condaenv(condaenv = "LipRtPred")
+    #rdkit <<- reticulate::import("rdkit", delay_load = TRUE)
   }
 }
 .onAttach <- function(libname, pkgname){
