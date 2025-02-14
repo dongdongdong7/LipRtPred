@@ -13,4 +13,5 @@ draw_smiles <- function(smiles){
             filePath = tempfile_name)
   img <- png::readPNG(tempfile_name)
   grid::grid.raster(img)
+  file.remove(tempfile_name)
 }
