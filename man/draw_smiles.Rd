@@ -4,10 +4,17 @@
 \alias{draw_smiles}
 \title{Draw molecules using smiles}
 \usage{
-draw_smiles(smiles)
+draw_smiles(smiles, SMARTS = NULL, molsPerRow = 1L, subImgSize = c(400L, 400L))
 }
 \arguments{
 \item{smiles}{A vector with smiles.}
+
+\item{SMARTS}{SMARTS pattern.}
+
+\item{molsPerRow}{mols number per row.}
+
+\item{subImgSize}{Size of sub image. The higher.
+The larger the molecule the larger the subImgSize should be assigned to make the image clearer}
 }
 \value{
 None.
@@ -16,5 +23,5 @@ None.
 Draw molecules using smiles
 }
 \examples{
-draw_smiles(smiles = c("c1ccccc1O", "CCCCC"))
+draw_smiles(smiles = c("CC(O)CC(O)C", "C(O)CC(O)C"), SMARTS = "CO")
 }
