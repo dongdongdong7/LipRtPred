@@ -2,4 +2,5 @@
 
 export(C_C_count)
 export(draw_smiles)
+export(get_atom_distance)
 export(smartsMatch)
