@@ -20,7 +20,7 @@ Atom number.
 Atom number between two C atom.
 }
 \examples{
-draw_smiles(smiles = "C(O)(=O)CC(O)C/C=C\\\\C/C=C\\\\C/C=C\\\\C/C=C\\\\CCCCC", SMARTS = "[CX3;$(C=O);$(C-O)](=O)O")
+draw_smiles(smiles = "C(O)(=O)CC(O)C/C=C\\\\C/C=C\\\\C/C=C\\\\C/C=C\\\\CCCCC", SMARTS = "[CX3;$(C=O);$(C-O)](=O)O", subImgSize = c(800, 800))
 smartsMatch(smiles = "C(O)(=O)CC(O)C/C=C\\\\C/C=C\\\\C/C=C\\\\C/C=C\\\\CCCCC", SMARTS = "[CX3;$(C=O);$(C-O)](=O)O")
 C_C_count("C(O)(=O)CC(O)C/C=C\\\\C/C=C\\\\C/C=C\\\\C/C=C\\\\CCCCC", start_atom_idx = 0, end_atom_idx = 7)
 }
