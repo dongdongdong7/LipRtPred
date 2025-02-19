@@ -25,7 +25,9 @@
     if(!reticulate::condaenv_exists("LipRtPred")){
       cat("Create LipRtPred environment...")
       reticulate::conda_create(envname = "LipRtPred", python_version = "3.11")
+      reticulate::py_install("pandas", envname = "LipRtPred", pip = TRUE)
       reticulate::py_install("rdkit", envname = "LipRtPred", pip = TRUE)
+      reticulate::py_install("mordredcommunity", envname = "LipRtPred", pip = TRUE)
     }
     reticulate::use_condaenv(condaenv = "LipRtPred")
     #rdkit <<- reticulate::import("rdkit", delay_load = TRUE)
