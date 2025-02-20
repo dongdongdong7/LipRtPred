@@ -4,7 +4,7 @@
 \alias{GetCDK_MD}
 \title{GetCDK_MD}
 \usage{
-GetCDK_MD(cmpDf, flavor = "CxSmiles", category = "all")
+GetCDK_MD(cmpDf, flavor = "CxSmiles", category = "all", thread = 1)
 }
 \arguments{
 \item{cmpDf}{A tibble or data.frame with two column, id and smiles.}
@@ -12,6 +12,8 @@ GetCDK_MD(cmpDf, flavor = "CxSmiles", category = "all")
 \item{flavor}{SMILES flavor.}
 
 \item{category}{cdk molecule descriptors category.}
+
+\item{thread}{Parallel thread.}
 }
 \value{
 A tibble.

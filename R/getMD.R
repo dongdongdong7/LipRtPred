@@ -19,24 +19,30 @@
 # data("cmpDf_demo", package = "LipRtPred")
 # category <- c("all", "protein", "hybrid", "constitutional", "topological", "electronic", "geometrical")[1]
 # .getCDKMD(cmpDf = cmpDf_demo)
-.getCDKMD <- function(cmpDf, category = "all"){
+.getCDKMD <- function(cmpDf, category = "all", thread = 1){
   if(any(is.na(cmpDf$smiles))){
     na_idx <- which(is.na(cmpDf$smiles))
     stop(paste0("cmpDf[", na_idx, ", ] has NA smiles!"))
   }
   message("Calculate CDK MD...")
-  mols <- rcdk::parse.smiles(cmpDf$smiles)
+  smis <- cmpDf$smiles
   dc <- rcdk::get.desc.categories()
   if(category == "all") dn <- unique(unlist(sapply(dc, rcdk::get.desc.names)))
   else dn <- rcdk::get.desc.names(category)
-  pb <- utils::txtProgressBar(max = length(mols), style = 3)
-  # The parallel method doesn't work
-  # Because th Java-Object jobjRef can't be propagated and the result is null
-  descsList <- lapply(1:length(mols), function(i) {
-    utils::setTxtProgressBar(pb, i)
-    mol <- mols[[i]]
-    rcdk::eval.desc(mol, dn)
-  })
+  pb <- utils::txtProgressBar(max = length(smis), style = 3)
+  progress <- function(n){utils::setTxtProgressBar(pb, n)}
+  opts <- list(progress = progress)
+  cl <- snow::makeCluster(thread)
+  doSNOW::registerDoSNOW(cl)
+  descsList <- foreach::`%dopar%`(foreach::foreach(smi = smis, n = 1:length(smis),
+                                                   .packages = c("rcdk"),
+                                                   .options.snow = opts),
+                                  {
+                                    mol <- rcdk::parse.smiles(smi)
+                                    rcdk::eval.desc(mol, dn)
+                                  })
+  snow::stopCluster(cl)
+  gc()
   descs <- purrr::list_rbind(descsList)
   return(dplyr::as_tibble(cbind(cmpDf, descs)))
 }
@@ -48,6 +54,7 @@
 #' @param cmpDf A tibble or data.frame with two column, id and smiles.
 #' @param flavor SMILES flavor.
 #' @param category cdk molecule descriptors category.
+#' @param thread Parallel thread.
 #'
 #' @return A tibble.
 #' @export
@@ -55,8 +62,8 @@
 #' @examples
 #' data("cmpDf_demo", package = "LipRtPred")
 #' descsDf <- GetCDK_MD(cmpDf = cmpDf_demo)
-GetCDK_MD <- function(cmpDf, flavor = "CxSmiles", category = "all"){
-  cmpDf$smiles <- .convertSMILES(smiles = cmpDf$smiles)
-  descsDf <- .getCDKMD(cmpDf = cmpDf_demo)
+GetCDK_MD <- function(cmpDf, flavor = "CxSmiles", category = "all", thread = 1){
+  cmpDf$smiles <- .convertSMILES(smiles = cmpDf$smiles, flavor = flavor)
+  descsDf <- .getCDKMD(cmpDf = cmpDf_demo, category = category, thread = thread)
   return(descsDf)
 }
