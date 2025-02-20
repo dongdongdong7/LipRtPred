@@ -58,6 +58,18 @@
   descs <- getRDKitMD_py(smis = as.list(cmpDf$smiles), thread = thread)
   return(dplyr::as_tibble(cbind(cmpDf, descs)))
 }
+# data("cmpDf_demo", package = "LipRtPred")
+# .getMordredMD(cmpDf = cmpDf_demo)
+.getMordredMD <- function(cmpDf, ignore_3D = TRUE, thread = 1){
+  if(any(is.na(cmpDf$smiles))){
+    na_idx <- which(is.na(cmpDf$smiles))
+    stop(paste0("cmpDf[", na_idx, ", ] has NA smiles!"))
+  }
+  message("Calculate Mordred MD...")
+  reticulate::source_python(system.file("python", "Mordred_MD.py", package = "LipRtPred"))
+  descs <- getMordredMD_py(smis = as.list(cmpDf$smiles), ignore_3D = ignore_3D, thread = thread)
+  return(dplyr::as_tibble(cbind(cmpDf, descs)))
+}
 #' @title GetCDK_MD
 #' @description
 #' Calculate cdk molecule descriptors for a cmpDf.
@@ -95,5 +107,25 @@ GetCDK_MD <- function(cmpDf, flavor = "CxSmiles", category = "all", thread = 1){
 GetRDKit_MD <- function(cmpDf, flavor = "CxSmiles", thread = 1){
   cmpDf$smiles <- .convertSMILES(smiles = cmpDf$smiles, flavor = flavor)
   descsDf <- .getRDKitMD(cmpDf = cmpDf, thread = thread)
+  return(descsDf)
+}
+#' @title GetMordred_MD
+#' @description
+#' Calculate mordred molecule descriptors for a cmpDf.
+#'
+#' @param cmpDf A tibble or data.frame with two column, id and smiles.
+#' @param flavor SMILES flavor.
+#' @param ignore_3D Whether to ignore 3D descriptors.
+#' @param thread Parallel thread.
+#'
+#' @return A tibble.
+#' @export
+#'
+#' @examples
+#' data("cmpDf_demo", package = "LipRtPred")
+#' descsDf <- GetMordred_MD(cmpDf = cmpDf_demo)
+GetMordred_MD <- function(cmpDf, flavor = "CxSmiles", ignore_3D = TRUE, thread = 1){
+  cmpDf$smiles <- .convertSMILES(smiles = cmpDf$smiles, flavor = flavor)
+  descsDf <- .getMordredMD(cmpDf = cmpDf, ignore_3D = ignore_3D, thread = as.integer(thread))
   return(descsDf)
 }
