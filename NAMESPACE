@@ -2,6 +2,7 @@
 
 export(C_C_count)
 export(GetCDK_MD)
+export(GetRDKit_MD)
 export(draw_smiles)
 export(get_atom_distance)
 export(smartsMatch)

@@ -46,7 +46,18 @@
   descs <- purrr::list_rbind(descsList)
   return(dplyr::as_tibble(cbind(cmpDf, descs)))
 }
-
+# data("cmpDf_demo", package = "LipRtPred")
+# .getRDKitMD(cmpDf = cmpDf_demo)
+.getRDKitMD <- function(cmpDf, thread = 1){
+  if(any(is.na(cmpDf$smiles))){
+    na_idx <- which(is.na(cmpDf$smiles))
+    stop(paste0("cmpDf[", na_idx, ", ] has NA smiles!"))
+  }
+  message("Calculate RDKit MD...")
+  reticulate::source_python(system.file("python", "RDKit_MD.py", package = "LipRtPred"))
+  descs <- getRDKitMD_py(smis = as.list(cmpDf$smiles), thread = thread)
+  return(dplyr::as_tibble(cbind(cmpDf, descs)))
+}
 #' @title GetCDK_MD
 #' @description
 #' Calculate cdk molecule descriptors for a cmpDf.
@@ -65,5 +76,24 @@
 GetCDK_MD <- function(cmpDf, flavor = "CxSmiles", category = "all", thread = 1){
   cmpDf$smiles <- .convertSMILES(smiles = cmpDf$smiles, flavor = flavor)
   descsDf <- .getCDKMD(cmpDf = cmpDf_demo, category = category, thread = thread)
+  return(descsDf)
+}
+#' @title GetRDKit_MD
+#' @description
+#' Calculate rdkit molecule descriptors for a cmpDf.
+#'
+#' @param cmpDf A tibble or data.frame with two column, id and smiles.
+#' @param flavor SMILES flavor.
+#' @param thread Parallel thread.
+#'
+#' @return A tibble.
+#' @export
+#'
+#' @examples
+#' data("cmpDf_demo", package = "LipRtPred")
+#' descsDf <- GetRDKit_MD(cmpDf = cmpDf_demo)
+GetRDKit_MD <- function(cmpDf, flavor = "CxSmiles", thread = 1){
+  cmpDf$smiles <- .convertSMILES(smiles = cmpDf$smiles, flavor = flavor)
+  descsDf <- .getRDKitMD(cmpDf = cmpDf, thread = thread)
   return(descsDf)
 }

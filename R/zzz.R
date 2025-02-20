@@ -28,6 +28,8 @@
       reticulate::py_install("pandas", envname = "LipRtPred", pip = TRUE)
       reticulate::py_install("rdkit", envname = "LipRtPred", pip = TRUE)
       reticulate::py_install("mordredcommunity", envname = "LipRtPred", pip = TRUE)
+      reticulate::py_install("joblib", envname = "LipRtPred", pip = TRUE)
+      reticulate::py_install("tqdm", envname = "LipRtPred", pip = TRUE)
     }
     reticulate::use_condaenv(condaenv = "LipRtPred")
     #rdkit <<- reticulate::import("rdkit", delay_load = TRUE)
