@@ -1,3 +1,4 @@
+# This is the script to generate cmpDf_demo object.
 library(magrittr)
 lipidmapsCmpTb <- pubcmpR::load_lipidmapsCmpTb()
 set.seed(2)
