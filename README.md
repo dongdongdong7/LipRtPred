@@ -12,21 +12,12 @@ data("cmpDf_demo", package = "LipRtPred")
 
 ## Calculate molecule descriptors
 
-### CDK
-
 ```R
+# CDK
 descsDf <- GetCDK_MD(cmpDf = cmpDf_demo, thread = 1)
-```
-
-### RDKit
-
-```R
+# RDKit
 descsDf <- GetRDKit_MD(cmpDf = cmpDf_demo, thread = 1)
-```
-
-### Mordred
-
-```R
+# Mordred
 descsDf <- GetMordred_MD(cmpDf = cmpDf_demo, thread = 1)
 ```
 
@@ -35,36 +26,16 @@ descsDf <- GetMordred_MD(cmpDf = cmpDf_demo, thread = 1)
 ### Morgan
 
 ```R
+# Morgan
 fpsDf <- GetMorgan_FP(cmpDf = cmpDf_demo, thread = 1)
-```
-
-### Feature Morgan
-
-```R
+# Feature Morgan
 fpsDf <- GetFMorgan_FP(cmpDf = cmpDf_demo, thread = 1)
-```
-
-### RDKit
-
-```R
+# RDKit
 fpsDf <- GetRDKit_FP(cmpDf = cmpDf_demo, thread = 1)
-```
-
-### Atom Pairs
-
-```R
+# Atom Pairs
 fpsDf <- GetAp_FP(cmpDf = cmpDf_demo, thread = 1)
-```
-
-### Topological Torsion
-
-```R
+# Topological Torsion
 fpsDf <- GetTt_FP(cmpDf = cmpDf_demo, thread = 1)
-```
-
-### MACCS Keys
-
-```R
+# MACCS Keys
 fpsDf <- GetMaccs_FP(cmpDf = cmpDf_demo, thread = 1)
 ```
-
