@@ -23,8 +23,6 @@ descsDf <- GetMordred_MD(cmpDf = cmpDf_demo, thread = 1)
 
 ## Calculate molecule fingerprints
 
-### Morgan
-
 ```R
 # Morgan
 fpsDf <- GetMorgan_FP(cmpDf = cmpDf_demo, thread = 1)
