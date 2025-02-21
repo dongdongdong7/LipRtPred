@@ -70,14 +70,13 @@
   descs <- getMordredMD_py(smis = as.list(cmpDf$smiles), ignore_3D = ignore_3D, thread = thread)
   return(dplyr::as_tibble(cbind(cmpDf, descs)))
 }
-#' @title GetCDK_MD
+#' @rdname getMD
+#' @title Calculate molecule descriptors.
 #' @description
-#' Calculate cdk molecule descriptors for a cmpDf.
+#' Three molecule descriptors can be computed, CDK, RDKit and Mordred.
 #'
-#' @param cmpDf A tibble or data.frame with two column, id and smiles.
-#' @param flavor SMILES flavor.
-#' @param category cdk molecule descriptors category.
-#' @param thread Parallel thread.
+#' @inherit GetMorgan_FP
+#' @param category CDK molecule descriptors category include "all", "protein", "hybrid", "constitutional", "topological", "electronic" and "geometrical"
 #'
 #' @return A tibble.
 #' @export
@@ -90,39 +89,21 @@ GetCDK_MD <- function(cmpDf, flavor = "CxSmiles", category = "all", thread = 1){
   descsDf <- .getCDKMD(cmpDf = cmpDf_demo, category = category, thread = thread)
   return(descsDf)
 }
-#' @title GetRDKit_MD
-#' @description
-#' Calculate rdkit molecule descriptors for a cmpDf.
-#'
-#' @param cmpDf A tibble or data.frame with two column, id and smiles.
-#' @param flavor SMILES flavor.
-#' @param thread Parallel thread.
-#'
-#' @return A tibble.
+#' @rdname getMD
 #' @export
 #'
 #' @examples
-#' data("cmpDf_demo", package = "LipRtPred")
 #' descsDf <- GetRDKit_MD(cmpDf = cmpDf_demo)
 GetRDKit_MD <- function(cmpDf, flavor = "CxSmiles", thread = 1){
   cmpDf$smiles <- .convertSMILES(smiles = cmpDf$smiles, flavor = flavor)
   descsDf <- .getRDKitMD(cmpDf = cmpDf, thread = thread)
   return(descsDf)
 }
-#' @title GetMordred_MD
-#' @description
-#' Calculate mordred molecule descriptors for a cmpDf.
-#'
-#' @param cmpDf A tibble or data.frame with two column, id and smiles.
-#' @param flavor SMILES flavor.
+#' @rdname getMD
 #' @param ignore_3D Whether to ignore 3D descriptors.
-#' @param thread Parallel thread.
-#'
-#' @return A tibble.
 #' @export
 #'
 #' @examples
-#' data("cmpDf_demo", package = "LipRtPred")
 #' descsDf <- GetMordred_MD(cmpDf = cmpDf_demo)
 GetMordred_MD <- function(cmpDf, flavor = "CxSmiles", ignore_3D = TRUE, thread = 1){
   cmpDf$smiles <- .convertSMILES(smiles = cmpDf$smiles, flavor = flavor)
