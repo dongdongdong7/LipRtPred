@@ -1,3 +1,7 @@
+# This script is used to calculate descriptors
+# 250221
+# Barry Song
+
 # data("cmpDf_demo", package = "LipRtPred")
 # ?rcdk::smiles.flavors
 # cmpDf_demo$smiles <- .convertSMILES(smiles = cmpDf_demo$smiles)
