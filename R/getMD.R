@@ -90,7 +90,7 @@
 #' descsDf <- GetCDK_MD(cmpDf = cmpDf_demo)
 GetCDK_MD <- function(cmpDf, flavor = "CxSmiles", category = "all", thread = 1){
   cmpDf$smiles <- .convertSMILES(smiles = cmpDf$smiles, flavor = flavor)
-  descsDf <- .getCDKMD(cmpDf = cmpDf_demo, category = category, thread = thread)
+  descsDf <- .getCDKMD(cmpDf = cmpDf, category = category, thread = thread)
   return(descsDf)
 }
 #' @rdname getMD
