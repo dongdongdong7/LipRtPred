@@ -22,7 +22,7 @@
 #' descsDf <- GetCDK_MD(cmpDf = cmpDf_demo)
 #' inputDf <- filterColumns(inputDf = descsDf)
 filterColumns <- function(inputDf, freqCut = 95/5, uniqueCut = 10){
-  marksColumns <- which(colnames(inputDf) %in% c("id", "smiles"))
+  marksColumns <- which(colnames(inputDf) %in% c("id", "smiles", "rt"))
   marksDf <- inputDf[, marksColumns]
   columnsDf <- inputDf[, -marksColumns]
 
