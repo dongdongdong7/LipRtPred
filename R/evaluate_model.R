@@ -22,6 +22,7 @@ predictRt <- function(testingDf, model){
   return(dplyr::as_tibble(cbind(y, prd)))
 }
 #' @rdname evaluate_model
+#' @export
 #' @examples
 #' evaluate_model(testingDf = testingDf, model = model_rf)
 evaluate_model <- function(testingDf, model){
