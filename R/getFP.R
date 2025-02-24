@@ -9,6 +9,11 @@
     na_idx <- which(is.na(cmpDf$smiles))
     stop(paste0("cmpDf[", na_idx, ", ] has NA smiles!"))
   }
+  wrong_idx <- .check_smiles(smiles = cmpDf$smiles)
+  if(length(wrong_idx) != 0){
+    message(paste0("Wrong Idx: ", paste0(wrong_idx, collapse = " ")))
+    cmpDf <- cmpDf[-wrong_idx, ]
+  }
   message("Calculate Morgan FP...")
   reticulate::source_python(system.file("python", "RDKit_FP.py", package = "LipRtPred"))
   fp <- getMorganFP_py(smis = as.list(cmpDf$smiles), radius = as.integer(radius), fpSize = as.integer(fpSize), count = count, thread = as.integer(thread))
@@ -21,6 +26,11 @@
   if(any(is.na(cmpDf$smiles))){
     na_idx <- which(is.na(cmpDf$smiles))
     stop(paste0("cmpDf[", na_idx, ", ] has NA smiles!"))
+  }
+  wrong_idx <- .check_smiles(smiles = cmpDf$smiles)
+  if(length(wrong_idx) != 0){
+    message(paste0("Wrong Idx: ", paste0(wrong_idx, collapse = " ")))
+    cmpDf <- cmpDf[-wrong_idx, ]
   }
   message("Calculate Feature Morgan FP...")
   reticulate::source_python(system.file("python", "RDKit_FP.py", package = "LipRtPred"))
@@ -35,6 +45,11 @@
     na_idx <- which(is.na(cmpDf$smiles))
     stop(paste0("cmpDf[", na_idx, ", ] has NA smiles!"))
   }
+  wrong_idx <- .check_smiles(smiles = cmpDf$smiles)
+  if(length(wrong_idx) != 0){
+    message(paste0("Wrong Idx: ", paste0(wrong_idx, collapse = " ")))
+    cmpDf <- cmpDf[-wrong_idx, ]
+  }
   message("Calculate RDKit FP...")
   reticulate::source_python(system.file("python", "RDKit_FP.py", package = "LipRtPred"))
   fp <- getRDKitFP_py(smis = as.list(cmpDf$smiles), minPath = as.integer(minPath), maxPath = as.integer(maxPath), useHs = useHs, fpSize = as.integer(fpSize), count = count, thread = as.integer(thread))
@@ -47,6 +62,11 @@
   if(any(is.na(cmpDf$smiles))){
     na_idx <- which(is.na(cmpDf$smiles))
     stop(paste0("cmpDf[", na_idx, ", ] has NA smiles!"))
+  }
+  wrong_idx <- .check_smiles(smiles = cmpDf$smiles)
+  if(length(wrong_idx) != 0){
+    message(paste0("Wrong Idx: ", paste0(wrong_idx, collapse = " ")))
+    cmpDf <- cmpDf[-wrong_idx, ]
   }
   message("Calculate Atom Pairs FP...")
   reticulate::source_python(system.file("python", "RDKit_FP.py", package = "LipRtPred"))
@@ -61,6 +81,11 @@
     na_idx <- which(is.na(cmpDf$smiles))
     stop(paste0("cmpDf[", na_idx, ", ] has NA smiles!"))
   }
+  wrong_idx <- .check_smiles(smiles = cmpDf$smiles)
+  if(length(wrong_idx) != 0){
+    message(paste0("Wrong Idx: ", paste0(wrong_idx, collapse = " ")))
+    cmpDf <- cmpDf[-wrong_idx, ]
+  }
   message("Calculate Topological Torsion FP...")
   reticulate::source_python(system.file("python", "RDKit_FP.py", package = "LipRtPred"))
   fp <- getTtFP_py(smis = as.list(cmpDf$smiles), fpSize = as.integer(fpSize), count = count, thread = as.integer(thread))
@@ -73,6 +98,11 @@
   if(any(is.na(cmpDf$smiles))){
     na_idx <- which(is.na(cmpDf$smiles))
     stop(paste0("cmpDf[", na_idx, ", ] has NA smiles!"))
+  }
+  wrong_idx <- .check_smiles(smiles = cmpDf$smiles)
+  if(length(wrong_idx) != 0){
+    message(paste0("Wrong Idx: ", paste0(wrong_idx, collapse = " ")))
+    cmpDf <- cmpDf[-wrong_idx, ]
   }
   message("Calculate MACCS FP...")
   reticulate::source_python(system.file("python", "RDKit_FP.py", package = "LipRtPred"))

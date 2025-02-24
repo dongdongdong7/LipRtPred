@@ -20,6 +20,15 @@
   message("\n")
   return(smiles)
 }
+# .check_smiles(smiles = cmpDf_demo2$smiles)
+.check_smiles <- function(smiles){
+  message("Check SMILES...")
+  reticulate::source_python(system.file("python", "RDKit_MD.py", package = "LipRtPred"))
+  resList <- check_smiles_py(smis = as.list(smiles))
+  wrong_idx <- which(sapply(resList, is.null))
+  warning(paste0("These SMILES can not be generated to a Mol object!\n", paste(smiles[wrong_idx], collapse = "\n")))
+  return(wrong_idx)
+}
 # data("cmpDf_demo", package = "LipRtPred")
 # category <- c("all", "protein", "hybrid", "constitutional", "topological", "electronic", "geometrical")[1]
 # .getCDKMD(cmpDf = cmpDf_demo)
@@ -57,6 +66,11 @@
     na_idx <- which(is.na(cmpDf$smiles))
     stop(paste0("cmpDf[", na_idx, ", ] has NA smiles!"))
   }
+  wrong_idx <- .check_smiles(smiles = cmpDf$smiles)
+  if(length(wrong_idx) != 0){
+    message(paste0("Wrong Idx: ", paste0(wrong_idx, collapse = " ")))
+    cmpDf <- cmpDf[-wrong_idx, ]
+  }
   message("Calculate RDKit MD...")
   reticulate::source_python(system.file("python", "RDKit_MD.py", package = "LipRtPred"))
   descs <- getRDKitMD_py(smis = as.list(cmpDf$smiles), thread = thread)
@@ -68,6 +82,11 @@
   if(any(is.na(cmpDf$smiles))){
     na_idx <- which(is.na(cmpDf$smiles))
     stop(paste0("cmpDf[", na_idx, ", ] has NA smiles!"))
+  }
+  wrong_idx <- .check_smiles(smiles = cmpDf$smiles)
+  if(length(wrong_idx) != 0){
+    message(paste0("Wrong Idx: ", paste0(wrong_idx, collapse = " ")))
+    cmpDf <- cmpDf[-wrong_idx, ]
   }
   message("Calculate Mordred MD...")
   reticulate::source_python(system.file("python", "Mordred_MD.py", package = "LipRtPred"))

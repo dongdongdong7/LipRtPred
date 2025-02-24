@@ -4,6 +4,10 @@ from joblib import Parallel, delayed
 from tqdm import tqdm
 import pandas as pd
 
+def check_smiles_py(smis):
+  mols = [Chem.MolFromSmiles(smi) for smi in smis]
+  return(mols)
+
 def getRDKitMD_loop_py(smi):
   mol = Chem.MolFromSmiles(smi)
   desc = Descriptors.CalcMolDescriptors(mol)
