@@ -129,7 +129,7 @@ build_brnn <- function(trainingDf, k = 10, percentage = 0.8, seed = 1,
   cores <- parallel::makeCluster(thread)
   doParallel::registerDoParallel(cores = cores)
   if(search == "grid"){
-    if(is.null(gird)) tune.grid <- base::expand.grid(neurons = c(1, 2, 3, 4, 5))
+    if(is.null(grid)) tune.grid <- base::expand.grid(neurons = c(1, 2, 3, 4, 5))
     else tune.grid <- grid
     set.seed(seed)
     model_brnn <- caret::train(rt ~ ., data = x,
