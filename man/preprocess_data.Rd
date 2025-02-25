@@ -5,7 +5,13 @@
 \alias{split_data}
 \title{Preprocess raw data}
 \usage{
-filterColumns(inputDf, freqCut = 95/5, uniqueCut = 10)
+filterColumns(
+  inputDf,
+  freqCut = 95/5,
+  uniqueCut = 10,
+  allowParallel = TRUE,
+  cutoff = 0.9
+)
 
 split_data(inputDf, percentage = 0.8, seed = 1)
 }
@@ -15,6 +21,10 @@ split_data(inputDf, percentage = 0.8, seed = 1)
 \item{freqCut}{The cutoff for the ratio of the most common value to the second most common value.}
 
 \item{uniqueCut}{The cutoff for the percentage of distinct values out of the number of total samples.}
+
+\item{allowParallel}{should the parallel processing via the foreach package be used for the computations? If TRUE, more memory will be used but execution time should be shorter.}
+
+\item{cutoff}{A numeric value for the pair-wise absolute correlation cutoff.}
 
 \item{percentage}{The percentage of data that goes to training.}
 

@@ -11,6 +11,8 @@
 #' @param inputDf Input data frame with id, smiles and MD or FP.
 #' @param freqCut The cutoff for the ratio of the most common value to the second most common value.
 #' @param uniqueCut The cutoff for the percentage of distinct values out of the number of total samples.
+#' @param allowParallel should the parallel processing via the foreach package be used for the computations? If TRUE, more memory will be used but execution time should be shorter.
+#' @param cutoff A numeric value for the pair-wise absolute correlation cutoff.
 #' @details
 #' This function uses the caret package, for more information on \code{\link[caret]{nearZeroVar}}.
 #'
@@ -21,7 +23,7 @@
 #' data("cmpDf_demo", package = "LipRtPred")
 #' descsDf <- GetCDK_MD(cmpDf = cmpDf_demo)
 #' inputDf <- filterColumns(inputDf = descsDf)
-filterColumns <- function(inputDf, freqCut = 95/5, uniqueCut = 10){
+filterColumns <- function(inputDf, freqCut = 95/5, uniqueCut = 10, allowParallel = TRUE, cutoff = 0.9){
   marksColumns <- which(colnames(inputDf) %in% c("id", "smiles", "rt"))
   marksDf <- inputDf[, marksColumns]
   columnsDf <- inputDf[, -marksColumns]
@@ -30,8 +32,12 @@ filterColumns <- function(inputDf, freqCut = 95/5, uniqueCut = 10){
   columnsDf <- columnsDf[, !apply(columnsDf, 2, function(x) any(is.na(x)))]
 
   message("Remove columns with near zero variance values")
-  nzvColumns <- caret::nearZeroVar(columnsDf, saveMetrics = FALSE, freqCut = freqCut, uniqueCut = uniqueCut)
-  columnsDf <- columnsDf[, -nzvColumns]
+  nzvColumns <- caret::nearZeroVar(columnsDf, saveMetrics = FALSE, freqCut = freqCut, uniqueCut = uniqueCut, allowParallel = allowParallel)
+  if(length(nzvColumns) != 0) columnsDf <- columnsDf[, -nzvColumns]
+
+  R <- stats::cor(columnsDf)
+  corColumns <- caret::findCorrelation(R, cutoff = cutoff)
+  if(length(corColumns) != 0) columnsDf <- columnsDf[, -corColumns]
 
   return(dplyr::as_tibble(cbind(marksDf, columnsDf)))
 }
