@@ -31,10 +31,11 @@ filterColumns <- function(inputDf, freqCut = 95/5, uniqueCut = 10, allowParallel
   message("Remove NA columns...")
   columnsDf <- columnsDf[, !apply(columnsDf, 2, function(x) any(is.na(x)))]
 
-  message("Remove columns with near zero variance values")
+  message("Remove columns with near zero variance values...")
   nzvColumns <- caret::nearZeroVar(columnsDf, saveMetrics = FALSE, freqCut = freqCut, uniqueCut = uniqueCut, allowParallel = allowParallel)
   if(length(nzvColumns) != 0) columnsDf <- columnsDf[, -nzvColumns]
 
+  message("Remove columns with high correlation...")
   R <- stats::cor(columnsDf)
   corColumns <- caret::findCorrelation(R, cutoff = cutoff)
   if(length(corColumns) != 0) columnsDf <- columnsDf[, -corColumns]
