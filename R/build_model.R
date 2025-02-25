@@ -18,7 +18,7 @@
 #' @param search Either "grid" or "random", describing how the tuning parameter grid is determined.
 #' @param grid A data frame with possible tuning values.
 #' @param metric A string that specifies what summary metric will be used to select the optimal model.
-#' @param thread Number of threads in parallel.
+#' @param allowParallel should the parallel processing via the foreach package be used for the computations? If TRUE, more memory will be used but execution time should be shorter.
 #' @details
 #' These functions use the caret packages.
 #' For more information about parameters, please refer to \code{\link[caret]{train}} and \code{\link[caret]{trainControl}} .
@@ -27,20 +27,19 @@
 #' @export
 #'
 #' @examples
-#' model_rf <- build_rf(trainingDf = trainingDf, thread = 3)
+#' model_rf <- build_rf(trainingDf = trainingDf)
 build_rf <- function(trainingDf, k = 10, percentage = 0.8, seed = 1,
                      search = "random", grid = NULL, metric = "Rsquared",
-                     thread = 1){
+                     allowParallel = TRUE){
   control <- caret::trainControl(method = "cv",
                                  number = k,
                                  p = percentage,
                                  search = search,
-                                 verboseIter = TRUE)
+                                 verboseIter = TRUE,
+                                 allowParallel = allowParallel)
   message("Building Random Forest model...")
   set.seed(seed)
   x <- trainingDf[, !colnames(trainingDf) %in% c("id", "smiles")]
-  cores <- parallel::makeCluster(thread)
-  doParallel::registerDoParallel(cores = cores)
   if(search == "grid"){
     if(is.null(grid)){
       grid <- base::expand.grid(mtry = c(1, 50, 100, 200, 500, 1000, 2000))
@@ -58,24 +57,21 @@ build_rf <- function(trainingDf, k = 10, percentage = 0.8, seed = 1,
                              metric = metric,
                              trControl = control)
   }
-  parallel::stopCluster(cores)
-  gc()
   return(model_rf)
 }
 #' @rdname build_model
 #' @export
 #'
 #' @examples
-#' model_xgb <- build_xgb(trainingDf = trainingDf, thread = 3)
+#' model_xgb <- build_xgb(trainingDf = trainingDf)
 build_xgb <- function(trainingDf, k = 10, percentage = 0.8, seed = 1,
                       search = "random", grid = NULL, metric = "Rsquared",
-                      thread = 1){
+                      allowParallel = TRUE){
   cv.ctrl <- caret::trainControl(method = "cv", number = k, p = percentage,
-                                 search = search, verboseIter = TRUE)
+                                 search = search, verboseIter = TRUE,
+                                 allowParallel = allowParallel)
   message("Building eXtreme Gradient Boosting model...")
   x <- trainingDf[, !colnames(trainingDf) %in% c("id", "smiles")]
-  cores <- parallel::makeCluster(thread)
-  doParallel::registerDoParallel(cores = cores)
   if(search == "grid" & is.null(grid)){
     if(is.null(gird)){
       # Use xgb.grid from Retip
@@ -106,28 +102,25 @@ build_xgb <- function(trainingDf, k = 10, percentage = 0.8, seed = 1,
                               metric = metric,
                               trControl = cv.ctrl)
   }
-  parallel::stopCluster(cores)
-  gc()
   return(model_xgb)
 }
 #' @rdname build_model
 #' @export
 #'
 #' @examples
-#' model_brnn <- build_brnn(trainingDf = trainingDf, thread = 3)
+#' model_brnn <- build_brnn(trainingDf = trainingDf)
 build_brnn <- function(trainingDf, k = 10, percentage = 0.8, seed = 1,
                        search = "random", grid = NULL, metric = "Rsquared",
-                       thread = 1){
+                       allowParallel = TRUE){
   # setting initial weight of neural network
   # seeds <- base::vector(mode = "list", length = nrow(trainingDf) + 1)
   # seeds <- base::lapply(seeds, function(x) 1:20)
   cv.ctrl <- caret::trainControl(method = "cv", number = k, p = percentage,
                                  search = search,
-                                 verboseIter = TRUE)
+                                 verboseIter = TRUE,
+                                 allowParallel = allowParallel)
   message("Building Bayesian Regularized Neural Networks...")
   x <- trainingDf[, !colnames(trainingDf) %in% c("id", "smiles")]
-  cores <- parallel::makeCluster(thread)
-  doParallel::registerDoParallel(cores = cores)
   if(search == "grid"){
     if(is.null(grid)) tune.grid <- base::expand.grid(neurons = c(1, 2, 3, 4, 5))
     else tune.grid <- grid
@@ -144,7 +137,5 @@ build_brnn <- function(trainingDf, k = 10, percentage = 0.8, seed = 1,
                                trControl = cv.ctrl,
                                metric = metric)
   }
-  parallel::stopCluster(cores)
-  gc()
   return(model_brnn)
 }

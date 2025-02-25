@@ -14,7 +14,7 @@ build_rf(
   search = "random",
   grid = NULL,
   metric = "Rsquared",
-  thread = 1
+  allowParallel = TRUE
 )
 
 build_xgb(
@@ -25,7 +25,7 @@ build_xgb(
   search = "random",
   grid = NULL,
   metric = "Rsquared",
-  thread = 1
+  allowParallel = TRUE
 )
 
 build_brnn(
@@ -36,7 +36,7 @@ build_brnn(
   search = "random",
   grid = NULL,
   metric = "Rsquared",
-  thread = 1
+  allowParallel = TRUE
 )
 }
 \arguments{
@@ -54,7 +54,7 @@ build_brnn(
 
 \item{metric}{A string that specifies what summary metric will be used to select the optimal model.}
 
-\item{thread}{Number of threads in parallel.}
+\item{allowParallel}{should the parallel processing via the foreach package be used for the computations? If TRUE, more memory will be used but execution time should be shorter.}
 }
 \value{
 A model list.
@@ -67,7 +67,7 @@ These functions use the caret packages.
 For more information about parameters, please refer to \code{\link[caret]{train}} and \code{\link[caret]{trainControl}} .
 }
 \examples{
-model_rf <- build_rf(trainingDf = trainingDf, thread = 3)
-model_xgb <- build_xgb(trainingDf = trainingDf, thread = 3)
-model_brnn <- build_brnn(trainingDf = trainingDf, thread = 3)
+model_rf <- build_rf(trainingDf = trainingDf)
+model_xgb <- build_xgb(trainingDf = trainingDf)
+model_brnn <- build_brnn(trainingDf = trainingDf)
 }
