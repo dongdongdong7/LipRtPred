@@ -18,7 +18,7 @@
 #' @param search Either "grid" or "random", describing how the tuning parameter grid is determined.
 #' @param grid A data frame with possible tuning values.
 #' @param metric A string that specifies what summary metric will be used to select the optimal model.
-#' @param allowParallel should the parallel processing via the foreach package be used for the computations? If TRUE, more memory will be used but execution time should be shorter.
+#' @param thread Number of threads in parallel.
 #' @details
 #' These functions use the caret packages.
 #' For more information about parameters, please refer to \code{\link[caret]{train}} and \code{\link[caret]{trainControl}} .
@@ -30,7 +30,7 @@
 #' model_rf <- build_rf(trainingDf = trainingDf)
 build_rf <- function(trainingDf, k = 10, percentage = 0.8, seed = 1,
                      search = "random", grid = NULL, metric = "Rsquared",
-                     allowParallel = TRUE){
+                     thread = 1){
   control <- caret::trainControl(method = "cv",
                                  number = k,
                                  p = percentage,
@@ -38,6 +38,8 @@ build_rf <- function(trainingDf, k = 10, percentage = 0.8, seed = 1,
                                  verboseIter = TRUE,
                                  allowParallel = allowParallel)
   message("Building Random Forest model...")
+  cl <- snow::makeCluster(thread)
+  doSNOW::registerDoSNOW(cl)
   set.seed(seed)
   x <- trainingDf[, !colnames(trainingDf) %in% c("id", "smiles")]
   if(search == "grid"){
@@ -57,6 +59,8 @@ build_rf <- function(trainingDf, k = 10, percentage = 0.8, seed = 1,
                              metric = metric,
                              trControl = control)
   }
+  snow::stopCluster(cl)
+  gc()
   return(model_rf)
 }
 #' @rdname build_model
@@ -66,11 +70,13 @@ build_rf <- function(trainingDf, k = 10, percentage = 0.8, seed = 1,
 #' model_xgb <- build_xgb(trainingDf = trainingDf)
 build_xgb <- function(trainingDf, k = 10, percentage = 0.8, seed = 1,
                       search = "random", grid = NULL, metric = "Rsquared",
-                      allowParallel = TRUE){
+                      thread = 1){
   cv.ctrl <- caret::trainControl(method = "cv", number = k, p = percentage,
                                  search = search, verboseIter = TRUE,
                                  allowParallel = allowParallel)
   message("Building eXtreme Gradient Boosting model...")
+  cl <- snow::makeCluster(thread)
+  doSNOW::registerDoSNOW(cl)
   x <- trainingDf[, !colnames(trainingDf) %in% c("id", "smiles")]
   if(search == "grid" & is.null(grid)){
     if(is.null(gird)){
@@ -102,6 +108,8 @@ build_xgb <- function(trainingDf, k = 10, percentage = 0.8, seed = 1,
                               metric = metric,
                               trControl = cv.ctrl)
   }
+  snow::stopCluster(cl)
+  gc()
   return(model_xgb)
 }
 #' @rdname build_model
@@ -111,7 +119,7 @@ build_xgb <- function(trainingDf, k = 10, percentage = 0.8, seed = 1,
 #' model_brnn <- build_brnn(trainingDf = trainingDf)
 build_brnn <- function(trainingDf, k = 10, percentage = 0.8, seed = 1,
                        search = "random", grid = NULL, metric = "Rsquared",
-                       allowParallel = TRUE){
+                       thread = 1){
   # setting initial weight of neural network
   # seeds <- base::vector(mode = "list", length = nrow(trainingDf) + 1)
   # seeds <- base::lapply(seeds, function(x) 1:20)
@@ -121,6 +129,8 @@ build_brnn <- function(trainingDf, k = 10, percentage = 0.8, seed = 1,
                                  allowParallel = allowParallel)
   message("Building Bayesian Regularized Neural Networks...")
   x <- trainingDf[, !colnames(trainingDf) %in% c("id", "smiles")]
+  cl <- snow::makeCluster(thread)
+  doSNOW::registerDoSNOW(cl)
   if(search == "grid"){
     if(is.null(grid)) tune.grid <- base::expand.grid(neurons = c(1, 2, 3, 4, 5))
     else tune.grid <- grid
@@ -137,5 +147,7 @@ build_brnn <- function(trainingDf, k = 10, percentage = 0.8, seed = 1,
                                trControl = cv.ctrl,
                                metric = metric)
   }
+  snow::stopCluster(cl)
+  gc()
   return(model_brnn)
 }

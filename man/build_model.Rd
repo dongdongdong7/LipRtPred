@@ -14,7 +14,7 @@ build_rf(
   search = "random",
   grid = NULL,
   metric = "Rsquared",
-  allowParallel = TRUE
+  thread = 1
 )
 
 build_xgb(
@@ -25,7 +25,7 @@ build_xgb(
   search = "random",
   grid = NULL,
   metric = "Rsquared",
-  allowParallel = TRUE
+  thread = 1
 )
 
 build_brnn(
@@ -36,7 +36,7 @@ build_brnn(
   search = "random",
   grid = NULL,
   metric = "Rsquared",
-  allowParallel = TRUE
+  thread = 1
 )
 }
 \arguments{
@@ -54,7 +54,7 @@ build_brnn(
 
 \item{metric}{A string that specifies what summary metric will be used to select the optimal model.}
 
-\item{allowParallel}{should the parallel processing via the foreach package be used for the computations? If TRUE, more memory will be used but execution time should be shorter.}
+\item{thread}{Number of threads in parallel.}
 }
 \value{
 A model list.

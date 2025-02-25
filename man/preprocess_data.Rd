@@ -9,7 +9,7 @@ filterColumns(
   inputDf,
   freqCut = 95/5,
   uniqueCut = 10,
-  allowParallel = FALSE,
+  thread = 1,
   cutoff = 0.9
 )
 
@@ -22,7 +22,7 @@ split_data(inputDf, percentage = 0.8, seed = 1)
 
 \item{uniqueCut}{The cutoff for the percentage of distinct values out of the number of total samples.}
 
-\item{allowParallel}{should the parallel processing via the foreach package be used for the computations? If TRUE, more memory will be used but execution time should be shorter.}
+\item{thread}{Number of threads in parallel.}
 
 \item{cutoff}{A numeric value for the pair-wise absolute correlation cutoff.}
 

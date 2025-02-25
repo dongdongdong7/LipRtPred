@@ -11,7 +11,7 @@
 #' @param inputDf Input data frame with id, smiles and MD or FP.
 #' @param freqCut The cutoff for the ratio of the most common value to the second most common value.
 #' @param uniqueCut The cutoff for the percentage of distinct values out of the number of total samples.
-#' @param allowParallel should the parallel processing via the foreach package be used for the computations? If TRUE, more memory will be used but execution time should be shorter.
+#' @param thread Number of threads in parallel.
 #' @param cutoff A numeric value for the pair-wise absolute correlation cutoff.
 #' @details
 #' This function uses the caret package, for more information on \code{\link[caret]{nearZeroVar}}.
@@ -23,7 +23,7 @@
 #' data("cmpDf_demo", package = "LipRtPred")
 #' descsDf <- GetCDK_MD(cmpDf = cmpDf_demo)
 #' inputDf <- filterColumns(inputDf = descsDf)
-filterColumns <- function(inputDf, freqCut = 95/5, uniqueCut = 10, allowParallel = FALSE, cutoff = 0.9){
+filterColumns <- function(inputDf, freqCut = 95/5, uniqueCut = 10, thread = 1, cutoff = 0.9){
   marksColumns <- which(colnames(inputDf) %in% c("id", "smiles", "rt"))
   marksDf <- inputDf[, marksColumns]
   columnsDf <- inputDf[, -marksColumns]
@@ -31,9 +31,13 @@ filterColumns <- function(inputDf, freqCut = 95/5, uniqueCut = 10, allowParallel
   message("Remove NA columns...")
   columnsDf <- columnsDf[, !apply(columnsDf, 2, function(x) any(is.na(x)))]
 
+  cl <- snow::makeCluster(thread)
+  doSNOW::registerDoSNOW(cl)
   message("Remove columns with near zero variance values...")
-  nzvColumns <- caret::nearZeroVar(columnsDf, saveMetrics = FALSE, freqCut = freqCut, uniqueCut = uniqueCut, allowParallel = allowParallel)
+  nzvColumns <- caret::nearZeroVar(columnsDf, saveMetrics = FALSE, freqCut = freqCut, uniqueCut = uniqueCut, allowParallel = TRUE)
   if(length(nzvColumns) != 0) columnsDf <- columnsDf[, -nzvColumns]
+  snow::stopCluster(cl)
+  gc()
 
   message("Remove columns with high correlation...")
   R <- stats::cor(columnsDf)
