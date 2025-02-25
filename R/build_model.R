@@ -36,7 +36,7 @@ build_rf <- function(trainingDf, k = 10, percentage = 0.8, seed = 1,
                                  p = percentage,
                                  search = search,
                                  verboseIter = TRUE,
-                                 allowParallel = allowParallel)
+                                 allowParallel = TRUE)
   message("Building Random Forest model...")
   cl <- snow::makeCluster(thread)
   doSNOW::registerDoSNOW(cl)
@@ -73,7 +73,7 @@ build_xgb <- function(trainingDf, k = 10, percentage = 0.8, seed = 1,
                       thread = 1){
   cv.ctrl <- caret::trainControl(method = "cv", number = k, p = percentage,
                                  search = search, verboseIter = TRUE,
-                                 allowParallel = allowParallel)
+                                 allowParallel = TRUE)
   message("Building eXtreme Gradient Boosting model...")
   cl <- snow::makeCluster(thread)
   doSNOW::registerDoSNOW(cl)
@@ -126,7 +126,7 @@ build_brnn <- function(trainingDf, k = 10, percentage = 0.8, seed = 1,
   cv.ctrl <- caret::trainControl(method = "cv", number = k, p = percentage,
                                  search = search,
                                  verboseIter = TRUE,
-                                 allowParallel = allowParallel)
+                                 allowParallel = TRUE)
   message("Building Bayesian Regularized Neural Networks...")
   x <- trainingDf[, !colnames(trainingDf) %in% c("id", "smiles")]
   cl <- snow::makeCluster(thread)
