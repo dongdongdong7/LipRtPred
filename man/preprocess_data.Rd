@@ -9,7 +9,7 @@ filterColumns(
   inputDf,
   freqCut = 95/5,
   uniqueCut = 10,
-  allowParallel = TRUE,
+  allowParallel = FALSE,
   cutoff = 0.9
 )
 

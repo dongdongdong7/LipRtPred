@@ -23,7 +23,7 @@
 #' data("cmpDf_demo", package = "LipRtPred")
 #' descsDf <- GetCDK_MD(cmpDf = cmpDf_demo)
 #' inputDf <- filterColumns(inputDf = descsDf)
-filterColumns <- function(inputDf, freqCut = 95/5, uniqueCut = 10, allowParallel = TRUE, cutoff = 0.9){
+filterColumns <- function(inputDf, freqCut = 95/5, uniqueCut = 10, allowParallel = FALSE, cutoff = 0.9){
   marksColumns <- which(colnames(inputDf) %in% c("id", "smiles", "rt"))
   marksDf <- inputDf[, marksColumns]
   columnsDf <- inputDf[, -marksColumns]
