@@ -20,7 +20,7 @@ def C_C_count_py(smi, start_atom_idx, end_atom_idx):
   if C_end_atom.GetSymbol() != "C":
     raise ValueError("End atom is not C")
   paths = rdmolops.GetShortestPath(mol, start_atom_idx, end_atom_idx) # a tuple with atom index
-  return len(paths) - 2
+  return(len(paths) - 2)
 
 def walk_away_py(smi, start_atom_idx, main_chains_atom_idx):
   visited_initial = set(main_chains_atom_idx)

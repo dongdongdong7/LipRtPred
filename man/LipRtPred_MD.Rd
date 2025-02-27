@@ -9,6 +9,7 @@
 \alias{.cal_c}
 \alias{.cal_d}
 \alias{.cal_h}
+\alias{.cal_n}
 \title{LipRtPred Molecule Descriptors}
 \usage{
 smartsMatch(smiles, SMARTS)
@@ -26,6 +27,8 @@ C_C_count(smi, start_atom_idx, end_atom_idx)
 .cal_d(smi, min_C = 1, max_C = 24, scriptPath)
 
 .cal_h(smi, min_C = 1, max_C = 24, scriptPath)
+
+.cal_n(smi, min_C = 1, max_C = 24, max_OH = 5, scriptPath)
 }
 \arguments{
 \item{smiles}{smiles vector}
@@ -71,9 +74,9 @@ C_C_count("C(O)(=O)CC(O)C/C=C\\\\C/C=C\\\\C/C=C\\\\C/C=C\\\\CCCCC", start_atom_i
        scriptPath = system.file("python", "SMARTS.py", package = "LipRtPred"))
 .cal_d(smi = "C(OC(=O)CCCCCCC/C=C\\\\CCCCCC)[C@]([H])(OC(CCCCCCC/C=C\\\\CCCCCC)=O)COC(CCCCCCC/C=C\\\\CCCCCC)=O",
        scriptPath = system.file("python", "SMARTS.py", package = "LipRtPred"))
-# example code
-
 .cal_h(smi = "C(CC/C=C\\\\C/C=C\\\\CC(O)C(O)C/C=C\\\\C/C=C\\\\C/C=C\\\\CC)(=O)O",
        min_C = 1, max_C = 24,
+       scriptPath = system.file("python", "SMARTS.py", package = "LipRtPred"))
+.cal_n(smi = "C(OC(=O)CCCCCCCCCCCCCC(O)CCC)[C@]([H])(OC(CCCCCC(O)CC(O)CCCCCCC)=O)COC(CCCCCCCCCCC)=O",
        scriptPath = system.file("python", "SMARTS.py", package = "LipRtPred"))
 }

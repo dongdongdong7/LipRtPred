@@ -58,7 +58,7 @@ C_C_count <- function(smi, start_atom_idx, end_atom_idx){
 #'            scriptPath = system.file("python", "SMARTS.py", package = "LipRtPred"))
 .C_C_count <- function(smi, start_atom_idx, end_atom_idx, scriptPath){
   reticulate::source_python(scriptPath)
-  atom_count <- C_C_count_py(smi = smiles, start_atom_idx = as.integer(start_atom_idx), end_atom_idx = as.integer(end_atom_idx))
+  atom_count <- C_C_count_py(smi = smi, start_atom_idx = as.integer(start_atom_idx), end_atom_idx = as.integer(end_atom_idx))
   return(atom_count)
 }
 
@@ -154,8 +154,6 @@ C_C_count <- function(smi, start_atom_idx, end_atom_idx){
 # Calculate OH number on FA's C-Chains
 #' @rdname LipRtPred_MD
 #' @examples
-#' # example code
-#'
 #' .cal_h(smi = "C(CC/C=C\\C/C=C\\CC(O)C(O)C/C=C\\C/C=C\\C/C=C\\CC)(=O)O",
 #'        min_C = 1, max_C = 24,
 #'        scriptPath = system.file("python", "SMARTS.py", package = "LipRtPred"))
@@ -163,7 +161,7 @@ C_C_count <- function(smi, start_atom_idx, end_atom_idx){
   FA_position <- .searchCOO(smi = smi, min_C = min_C, max_C = max_C, scriptPath = scriptPath)
   if(length(FA_position) == 0) return(0)
   FA_position <- unlist(FA_position)
-  matchList <- .smartsMatch(smiles = smi, SMARTS = "[CX4;$(C-O)]", scriptPath = scriptPath)[[1]]
+  matchList <- .smartsMatch(smiles = smi, SMARTS = "[CX4;$(C-[OH])]", scriptPath = scriptPath)[[1]]
   if(length(matchList) == 0) return(0)
   matchNum <- sapply(matchList, function(x) {
     if(all(x %in% FA_position)) return(1)
@@ -172,7 +170,60 @@ C_C_count <- function(smi, start_atom_idx, end_atom_idx){
   return(sum(matchNum))
 }
 
+# Calculate OH position on FA's C-Chains
+#' @rdname LipRtPred_MD
+#' @examples
+#' .cal_n(smi = "C(OC(=O)CCCCCCCCCCCCCC(O)CCC)[C@]([H])(OC(CCCCCC(O)CC(O)CCCCCCC)=O)COC(CCCCCCCCCCC)=O",
+#'        scriptPath = system.file("python", "SMARTS.py", package = "LipRtPred"))
+.cal_n <- function(smi, min_C = 1, max_C = 24, max_OH = 5,scriptPath){
+  FA_position <- .searchCOO(smi = smi, min_C = min_C, max_C = max_C, scriptPath = scriptPath)
+  if(length(FA_position) == 0) return(0)
+  FAC_position <- .smartsMatch(smiles = smi, SMARTS = "[CX3;$(C=O);$(C-O)]", scriptPath = scriptPath)[[1]]
+  #FA_position <- unlist(FA_position)
+  FAOH_position <- .smartsMatch(smiles = smi, SMARTS = "[CX4;$(C-[OH])]", scriptPath = scriptPath)[[1]]
+  if(length(FAOH_position) == 0) return(rep(0, max_OH))
+  # .C_C_count("C(O)C(=O)OC") will return 0
+  # distance can not be 0 so + 1
+  distance <- sapply(FAOH_position, function(x) {
+    chain_rightNow <- FA_position[sapply(FA_position, function(y) {
+      x %in% y
+    })][[1]]
+    C_chain_rightNow <- FAC_position[sapply(FAC_position, function(y) {
+      y %in% chain_rightNow
+    })][[1]]
+    .C_C_count(smi = smi, start_atom_idx = x, end_atom_idx = C_chain_rightNow, scriptPath = scriptPath)
+  }) + 1
+  distance <- sort(distance)[1:max_OH]
+  names(distance) <- paste0("n", 1:max_OH)
+  return(distance)
+}
 
+# Search glycerol position
+# .searchGlycerol(smi = "C(OC(=O)CCCCCCCCCCCCCCCCC)[C@]([H])(OC(CCCCCCCCCCCCCCC)=O)COC(CCCCCCCCCCC)=O",
+#                 scriptPath = system.file("python", "SMARTS.py", package = "LipRtPred"))
+.searchGlycerol <- function(smi, scriptPath){
+  return(.smartsMatch(smiles = smi, SMARTS = "[CH2;$(C-O)]-[CH;$(C-O)]-[CH2;$(C-O)]", scriptPath = scriptPath)[[1]])
+}
+# Search glycerol FA
+# .cal_alpha(smi = "C(OC(=O)CCCCCCCCCCCCCCCCC)[C@]([H])(OC(CCCCCCCCCCCCCCC)=O)COC(CCCCCCCCCCC)=O",
+#            scriptPath = system.file("python", "SMARTS.py", package = "LipRtPred"))
+.cal_alpha <- function(smi, min_C = 1, max_C = 24, scriptPath){
+  FA_position <- .searchCOO(smi = smi, min_C = min_C, max_C = max_C, scriptPath = scriptPath)
+  if(length(FA_position) == 0) return(c(alpha = 0, beta = 0, gama = 0))
+  Clycerol_position <- .searchGlycerol(smi = smi, scriptPath = scriptPath)
+  alpha_gama <- .smartsMatch(smiles = smi, SMARTS = "[CX3;$(C=O);$(C-O)](=O)O[CH2;$(C-O)]-[CH;$(C-O)]-[CH2;$(C-O)]", scriptPath = scriptPath)[[1]]
+  if(length(alpha_gama) == 0){
+    alpha <- 0;gama <- 0
+  }else if(length(alpha_gama) == 1){
+    alpha <- 1;gama <- 0
+  }else if(length(alpha_gama) == 2){
+    alpha <- 1;gama <- 1
+  }
+  beta_position <- .smartsMatch(smiles = smi, SMARTS = "[CH2;$(C-O)]-[CH;$(C-O)](OC(=O))-[CH2;$(C-O)]", scriptPath = scriptPath)[[1]]
+  if(length(beta_position) == 0) beta <- 0
+  else if(length(beta_position)) beta <- 1
+  return(c(alpha = alpha, beta = beta, gama = gama))
+}
 # .getLipRtPredMD(smi = "CC(O)CC(=O)OC", scriptPath = system.file("python", "SMARTS.py", package = "LipRtPred"))
 .getLipRtPredMD <- function(smi, scriptPath){
   browser()
