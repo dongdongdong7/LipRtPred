@@ -39,7 +39,10 @@ evaluate_model <- function(testingDf, model){
   r_squared <- round(1- (SSE / SST), 2)
   n <- nrow(x)
   p <- ncol(x)
-  if(n > p) r_squared_adjust <- round(1 - (1 - r_squared) * ((n - 1) / (n - p - 1)), 2)
+  if(n > p){
+    r_squared_adjust <- round(1 - (1 - r_squared) * ((n - 1) / (n - p - 1)), 2)
+    if(r_squared_adjust < 0) r_squared_adjust <- 0
+  }
   else r_squared_adjust <- NA
   stats_table <- data.frame(Stats = c("MAE", "RMSE", "R2", "R2_adjust"), Values = c(mae, rmse, r_squared, r_squared_adjust))
   stats_table <- stats_table %>%
