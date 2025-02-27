@@ -118,21 +118,21 @@ C_C_count <- function(smi, start_atom_idx, end_atom_idx){
 #' .cal_c(smi = "C(OCCCCCCCCCCCCC(C)C)C(OC(CCCCCCCCCCCC(C)C)=O)COC(=O)CCCCCCCCCCCC(C)C",
 #'        scriptPath = system.file("python", "SMARTS.py", package = "LipRtPred"))
 .cal_c <- function(smi, min_C = 1, max_C = 24, scriptPath){
-  res <- .searchCOO(smi, min_C = min_C, max_C = max_C, scriptPath = scriptPath)
+  FA_position <- .searchCOO(smi, min_C = min_C, max_C = max_C, scriptPath = scriptPath)
+  if(length(FA_position) == 0) return(0)
   strand_C_position <- .smartsMatch(smiles = smi, SMARTS = "[C;$([CH0,CH1]);$(C(C)C);!$(C-O);!$(C-N);!$(C-P);!$(C-S)]", scriptPath = scriptPath)[[1]]
   strand_C_position <- lapply(strand_C_position, function(x){
-    if(x %in% unlist(res)) return(x)
+    if(x %in% unlist(FA_position)) return(x)
     else return(NULL)
   })
   strand_C_position <- strand_C_position[!sapply(strand_C_position, is.null)]
   if(length(strand_C_position) == 0) strand_C_num <- 0
   else{
     strand_C_num <- sum(sapply(strand_C_position, function(i) {
-      .walk_away(smi = smi, start_atom_idx = i, main_chains_atom_idx = unlist(res)[unlist(res) != i], scriptPath = scriptPath)
+      .walk_away(smi = smi, start_atom_idx = i, main_chains_atom_idx = unlist(FA_position)[unlist(FA_position) != i], scriptPath = scriptPath)
     }))
   }
-  if(length(res) == 0) return(0)
-  else return(as.integer(sum(sapply(res, length))) + strand_C_num)
+  return(as.integer(sum(sapply(FA_position, length))) + strand_C_num)
 }
 # Calculate = number on FA's C-Chains.
 #' @rdname LipRtPred_MD
@@ -141,6 +141,7 @@ C_C_count <- function(smi, start_atom_idx, end_atom_idx){
 #'        scriptPath = system.file("python", "SMARTS.py", package = "LipRtPred"))
 .cal_d <- function(smi, min_C = 1, max_C = 24, scriptPath){
   FA_position <- .searchCOO(smi = smi, min_C = min_C, max_C = max_C, scriptPath = scriptPath)
+  if(length(FA_position) == 0) return(0)
   FA_position <- unlist(FA_position)
   matchList <- .smartsMatch(smiles = smi, SMARTS = "C=C", scriptPath = scriptPath)[[1]]
   if(length(matchList) == 0) return(0)
@@ -151,6 +152,26 @@ C_C_count <- function(smi, start_atom_idx, end_atom_idx){
   return(sum(matchNum))
 }
 # Calculate OH number on FA's C-Chains
+#' @rdname LipRtPred_MD
+#' @examples
+#' # example code
+#'
+#' .cal_h(smi = "C(CC/C=C\\C/C=C\\CC(O)C(O)C/C=C\\C/C=C\\C/C=C\\CC)(=O)O",
+#'        min_C = 1, max_C = 24,
+#'        scriptPath = system.file("python", "SMARTS.py", package = "LipRtPred"))
+.cal_h <- function(smi, min_C = 1, max_C = 24, scriptPath){
+  FA_position <- .searchCOO(smi = smi, min_C = min_C, max_C = max_C, scriptPath = scriptPath)
+  if(length(FA_position) == 0) return(0)
+  FA_position <- unlist(FA_position)
+  matchList <- .smartsMatch(smiles = smi, SMARTS = "[CX4;$(C-O)]", scriptPath = scriptPath)[[1]]
+  if(length(matchList) == 0) return(0)
+  matchNum <- sapply(matchList, function(x) {
+    if(all(x %in% FA_position)) return(1)
+    else return(0)
+  })
+  return(sum(matchNum))
+}
+
 
 # .getLipRtPredMD(smi = "CC(O)CC(=O)OC", scriptPath = system.file("python", "SMARTS.py", package = "LipRtPred"))
 .getLipRtPredMD <- function(smi, scriptPath){
