@@ -77,6 +77,10 @@ C_C_count("C(O)(=O)CC(O)C/C=C\\\\C/C=C\\\\C/C=C\\\\C/C=C\\\\CCCCC", start_atom_i
 .cal_h(smi = "C(CC/C=C\\\\C/C=C\\\\CC(O)C(O)C/C=C\\\\C/C=C\\\\C/C=C\\\\CC)(=O)O",
        min_C = 1, max_C = 24,
        scriptPath = system.file("python", "SMARTS.py", package = "LipRtPred"))
+.cal_h(smi = "CCC=CCC(O)OC=CC=CCCCCCCCC(=O)O",
+       scriptPath = system.file("python", "SMARTS.py", package = "LipRtPred"))
 .cal_n(smi = "C(OC(=O)CCCCCCCCCCCCCC(O)CCC)[C@]([H])(OC(CCCCCC(O)CC(O)CCCCCCC)=O)COC(CCCCCCCCCCC)=O",
+       scriptPath = system.file("python", "SMARTS.py", package = "LipRtPred"))
+.cal_n(smi = "CCC=CCC(O)OC=CC=CCCCCCCCC(=O)O",
        scriptPath = system.file("python", "SMARTS.py", package = "LipRtPred"))
 }
