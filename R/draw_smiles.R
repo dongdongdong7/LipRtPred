@@ -56,7 +56,7 @@ draw_smi <- function(smi, width = 450, height = 150,
               addStereoAnnotation = addStereoAnnotation,
               explicitMethyl = explicitMethyl)
   img <- png::readPNG(tempfile_name)
-  grid::grid.raster(img)
+  grid::grid.raster(img, width = grid::unit(1, "npc"))
   file.remove(tempfile_name)
   invisible(NULL)
 }
