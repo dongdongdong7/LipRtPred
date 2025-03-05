@@ -40,4 +40,10 @@ def walk_away_py(smi, start_atom_idx, non_traversable_atom_ids):
   mol = Chem.MolFromSmiles(smi)
   return(dfs(atom_idx = start_atom_idx, visited = visited_initial) - 1)
   
-  
+def getAtomSymbol_py(smi, atom_idx_list):
+  mol = Chem.MolFromSmiles(smi)
+  symbolList = []
+  for atom_idx in atom_idx_list:
+    atom = mol.GetAtomWithIdx(atom_idx)
+    symbolList.append(atom.GetSymbol())
+  return symbolList

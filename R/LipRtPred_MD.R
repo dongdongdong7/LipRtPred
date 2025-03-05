@@ -62,6 +62,13 @@ C_C_count <- function(smi, start_atom_idx, end_atom_idx){
   return(atom_count)
 }
 
+# .getAtomSymbol(smi = "CCC=CCC(O)OC=CC=CCCCCCCCC(=O)O", atom_idx = c(6, 19, 7),
+#                scriptPath = system.file("python", "SMARTS.py", package = "LipRtPred"))
+.getAtomSymbol <- function(smi, atom_idx, scriptPath){
+  reticulate::source_python(scriptPath)
+  getAtomSymbol_py(smi = smi, atom_idx_list = as.list(as.integer(atom_idx)))
+}
+
 # Find atoms position of fatty acyl's main chain
 # min_C: Minimum value of main chain length to be considered
 # max_C: Maximum value of main chain length to be considered
@@ -148,28 +155,31 @@ C_C_count <- function(smi, start_atom_idx, end_atom_idx){
 # .cal_c(smi = "C(OCCCCCCCCCCCCC(C)C)C(OC(CCCCCCCCCCCC(C)C)=O)COC(=O)CCCCCCCCCCCC(C)C",
 #        scriptPath = system.file("python", "SMARTS.py", package = "LipRtPred"))
 .cal_c <- function(smi, min_C = 1, max_C = 24, scriptPath){
-  browser()
   FA_position <- .searchCOO(smi, min_C = min_C, max_C = max_C, scriptPath = scriptPath)
   if(length(FA_position) == 0) return(0)
-  strand_C_position <- .smartsMatch(smiles = smi, SMARTS = "[C;$([CH0,CH1]);$(C(C)C);!$(C-O);!$(C-N);!$(C-P);!$(C-S)]", scriptPath = scriptPath)[[1]]
-  strand_C_position <- lapply(strand_C_position, function(x){
+  branch_C_position <- .searchBranch(smi = smi, scriptPath = scriptPath)
+  branch_C_position <- lapply(branch_C_position, function(x){
     if(x %in% unlist(FA_position)) return(x)
     else return(NULL)
   })
-  strand_C_position <- strand_C_position[!sapply(strand_C_position, is.null)]
-  if(length(strand_C_position) == 0) strand_C_num <- 0
+  branch_C_position <- branch_C_position[!sapply(branch_C_position, is.null)]
+  if(length(branch_C_position) == 0) strand_C_num <- 0
   else{
-    strand_C_num <- sum(sapply(strand_C_position, function(i) {
-      .walk_away(smi = smi, start_atom_idx = i, main_chains_atom_idx = unlist(FA_position)[unlist(FA_position) != i], scriptPath = scriptPath)
+    branch_C_num <- sum(sapply(branch_C_position, function(i) {
+      .walk_away(smi = smi, start_atom_idx = i, non_traversable_atom_ids = unlist(FA_position)[unlist(FA_position) != i], scriptPath = scriptPath)
     }))
   }
-  return(as.integer(sum(sapply(FA_position, length))) + strand_C_num)
+  FA_position <- unlist(FA_position)
+  FA_symbols <- .getAtomSymbol(smi = smi, atom_idx = FA_position, scriptPath = scriptPath)
+  FA_C_num <- sum(sapply(FA_symbols, function(x){
+    if(x == "C") return(1)
+    else return(0)
+  }))
+  return(as.integer(FA_C_num + branch_C_num))
 }
 # Calculate = number on FA's C-Chains.
-#' @rdname LipRtPred_MD
-#' @examples
-#' .cal_d(smi = "C(OC(=O)CCCCCCC/C=C\\CCCCCC)[C@]([H])(OC(CCCCCCC/C=C\\CCCCCC)=O)COC(CCCCCCC/C=C\\CCCCCC)=O",
-#'        scriptPath = system.file("python", "SMARTS.py", package = "LipRtPred"))
+# .cal_d(smi = "C(OC(=O)CCCCCCC/C=C\\CCCCCC)[C@]([H])(OC(CCCCCCC/C=C\\CCCCCC)=O)COC(CCCCCCC/C=C\\CCCCCC)=O",
+#        scriptPath = system.file("python", "SMARTS.py", package = "LipRtPred"))
 .cal_d <- function(smi, min_C = 1, max_C = 24, scriptPath){
   FA_position <- .searchCOO(smi = smi, min_C = min_C, max_C = max_C, scriptPath = scriptPath)
   if(length(FA_position) == 0) return(0)
@@ -183,13 +193,11 @@ C_C_count <- function(smi, start_atom_idx, end_atom_idx){
   return(sum(matchNum))
 }
 # Calculate OH number on FA's C-Chains
-#' @rdname LipRtPred_MD
-#' @examples
-#' .cal_h(smi = "C(CC/C=C\\C/C=C\\CC(O)C(O)C/C=C\\C/C=C\\C/C=C\\CC)(=O)O",
-#'        min_C = 1, max_C = 24,
-#'        scriptPath = system.file("python", "SMARTS.py", package = "LipRtPred"))
-#' .cal_h(smi = "CCC=CCC(O)OC=CC=CCCCCCCCC(=O)O",
-#'        scriptPath = system.file("python", "SMARTS.py", package = "LipRtPred"))
+# .cal_h(smi = "C(CC/C=C\\C/C=C\\CC(O)C(O)C/C=C\\C/C=C\\C/C=C\\CC)(=O)O",
+#        min_C = 1, max_C = 24,
+#        scriptPath = system.file("python", "SMARTS.py", package = "LipRtPred"))
+# .cal_h(smi = "CCC=CCC(O)OC=CC=CCCCCCCCC(=O)O",
+#        scriptPath = system.file("python", "SMARTS.py", package = "LipRtPred"))
 .cal_h <- function(smi, min_C = 1, max_C = 24, scriptPath){
   FA_position <- .searchCOO(smi = smi, min_C = min_C, max_C = max_C, scriptPath = scriptPath)
   if(length(FA_position) == 0) return(0)
@@ -204,12 +212,10 @@ C_C_count <- function(smi, start_atom_idx, end_atom_idx){
 }
 
 # Calculate OH position on FA's C-Chains
-#' @rdname LipRtPred_MD
-#' @examples
-#' .cal_n(smi = "C(OC(=O)CCCCCCCCCCCCCC(O)CCC)[C@]([H])(OC(CCCCCC(O)CC(O)CCCCCCC)=O)COC(CCCCCCCCCCC)=O",
-#'        scriptPath = system.file("python", "SMARTS.py", package = "LipRtPred"))
-#' .cal_n(smi = "CCC=CCC(O)OC=CC=CCCCCCCCC(=O)O",
-#'        scriptPath = system.file("python", "SMARTS.py", package = "LipRtPred"))
+# .cal_n(smi = "C(OC(=O)CCCCCCCCCCCCCC(O)CCC)[C@]([H])(OC(CCCCCC(O)CC(O)CCCCCCC)=O)COC(CCCCCCCCCCC)=O",
+#        scriptPath = system.file("python", "SMARTS.py", package = "LipRtPred"))
+# .cal_n(smi = "CCC=CCC(O)OC=CC=CCCCCCCCC(=O)O",
+#        scriptPath = system.file("python", "SMARTS.py", package = "LipRtPred"))
 .cal_n <- function(smi, min_C = 1, max_C = 24, max_OH = 5,scriptPath){
   FA_position <- .searchCOO(smi = smi, min_C = min_C, max_C = max_C, scriptPath = scriptPath)
   if(length(FA_position) == 0) return(0)
