@@ -5,8 +5,6 @@
 \alias{.smartsMatch}
 \alias{C_C_count}
 \alias{.C_C_count}
-\alias{.searchCOO}
-\alias{.cal_c}
 \alias{.cal_d}
 \alias{.cal_h}
 \alias{.cal_n}
@@ -19,10 +17,6 @@ smartsMatch(smiles, SMARTS)
 C_C_count(smi, start_atom_idx, end_atom_idx)
 
 .C_C_count(smi, start_atom_idx, end_atom_idx, scriptPath)
-
-.searchCOO(smi, min_C = 1, max_C = 24, scriptPath)
-
-.cal_c(smi, min_C = 1, max_C = 24, scriptPath)
 
 .cal_d(smi, min_C = 1, max_C = 24, scriptPath)
 
@@ -40,10 +34,6 @@ C_C_count(smi, start_atom_idx, end_atom_idx)
 \item{start_atom_idx}{The index of start atom}
 
 \item{end_atom_idx}{The index of end atom}
-
-\item{min_C}{Minimum value of C-chain length to be considered}
-
-\item{max_C}{Maximum value of C-chain length to be considered}
 }
 \value{
 A list.
@@ -66,12 +56,6 @@ smartsMatch(smiles = "C(O)(=O)CC(O)C/C=C\\\\C/C=C\\\\C/C=C\\\\C/C=C\\\\CCCCC", S
 C_C_count("C(O)(=O)CC(O)C/C=C\\\\C/C=C\\\\C/C=C\\\\C/C=C\\\\CCCCC", start_atom_idx = 0, end_atom_idx = 7)
 .C_C_count("C(O)(=O)CC(O)C/C=C\\\\C/C=C\\\\C/C=C\\\\C/C=C\\\\CCCCC", start_atom_idx = 0, end_atom_idx = 7,
            scriptPath = system.file("python", "SMARTS.py", package = "LipRtPred"))
-.searchCOO(smi = "C(OC(=O)CCCCCCCCCCCCCCCCC)[C@]([H])(OC(CCCCCCCCCCCCCCC)=O)COC(CCCCCCCCCCC)=O",
-           scriptPath = system.file("python", "SMARTS.py", package = "LipRtPred"))
-.cal_c(smi = "C(OC(=O)CCCCCCCCCCCCCCCCC)[C@]([H])(OC(CCCCCCCCCCCCCCC)=O)COC(CCCCCCCCCCC)=O",
-       scriptPath = system.file("python", "SMARTS.py", package = "LipRtPred"))
-.cal_c(smi = "C(OCCCCCCCCCCCCC(C)C)C(OC(CCCCCCCCCCCC(C)C)=O)COC(=O)CCCCCCCCCCCC(C)C",
-       scriptPath = system.file("python", "SMARTS.py", package = "LipRtPred"))
 .cal_d(smi = "C(OC(=O)CCCCCCC/C=C\\\\CCCCCC)[C@]([H])(OC(CCCCCCC/C=C\\\\CCCCCC)=O)COC(CCCCCCC/C=C\\\\CCCCCC)=O",
        scriptPath = system.file("python", "SMARTS.py", package = "LipRtPred"))
 .cal_h(smi = "C(CC/C=C\\\\C/C=C\\\\CC(O)C(O)C/C=C\\\\C/C=C\\\\C/C=C\\\\CC)(=O)O",

@@ -62,20 +62,20 @@ C_C_count <- function(smi, start_atom_idx, end_atom_idx){
   return(atom_count)
 }
 
-# This function is used to search FA's C position.
-#' @rdname LipRtPred_MD
-#' @param min_C Minimum value of C-chain length to be considered
-#' @param max_C Maximum value of C-chain length to be considered
-#' @examples
-#' .searchCOO(smi = "C(OC(=O)CCCCCCCCCCCCCCCCC)[C@]([H])(OC(CCCCCCCCCCCCCCC)=O)COC(CCCCCCCCCCC)=O",
-#'            scriptPath = system.file("python", "SMARTS.py", package = "LipRtPred"))
+# Find atoms position of fatty acyl's main chain
+# min_C: Minimum value of main chain length to be considered
+# max_C: Maximum value of main chain length to be considered
+# .searchCOO(smi = "C(OC(=O)CCCCCCCCCCCCCCCCC)[C@]([H])(OC(CCCCCCCCCCCCCCC)=O)COC(CCCCCCCCCCC)=O",
+#            scriptPath = system.file("python", "SMARTS.py", package = "LipRtPred"))
 # .searchCOO(smi = "CCC=CCC(O)OC=CC=CCCCCCCCC(=O)O",
+#            scriptPath = system.file("python", "SMARTS.py", package = "LipRtPred"))
+# .searchCOO(smi = "C(OCCCCCCCC(CC)(CCC)CCCCC(C)C)C(OC(CCCCCCCCCCCC(C)C)=O)COC(=O)CCCCCCC(CC)CCCCC(C)C",
 #            scriptPath = system.file("python", "SMARTS.py", package = "LipRtPred"))
 .searchCOO <- function(smi, min_C = 1, max_C = 24, scriptPath){
   if(min_C <= 0 | max_C > 50 | min_C >= max_C){
     stop("Please reset min_C or max_C!")
   }
-  pattern <- sapply((min_C - 1):(max_C - 1), function(x) paste(rep("[C,OH0;!$(O=C)]~", x), collapse = ""))
+  pattern <- sapply((min_C - 1):(max_C - 1), function(x) paste(rep("[C,OH0;!$(O=C);!$(O-[CX3;$(C=O);$(C-O)])]~", x), collapse = ""))
   pattern <- paste0(pattern, "[CX3;$(C=O);$(C-O)]")
   chains_lenList <- lapply(pattern, function(x) {
     searchList <- .smartsMatch(smi, x, scriptPath = scriptPath)[[1]]
@@ -89,7 +89,7 @@ C_C_count <- function(smi, start_atom_idx, end_atom_idx){
   })
   if(all(sapply(chains_len, function(len) len == 0))) return(list())
   chains_len <- sort(chains_len, decreasing = TRUE)
-  pattern_target <- sapply(chains_len - 1, function(x) paste(rep("[C,OH0;!$(O=C)]~", x), collapse = ""))
+  pattern_target <- sapply(chains_len - 1, function(x) paste(rep("[C,OH0;!$(O=C);!$(O-[CX3;$(C=O);$(C-O)])]~", x), collapse = ""))
   pattern_target <- paste0(pattern_target, "[CX3;$(C=O);$(C-O)]")
   idx_target <- c()
   idx_target_list <- list()
@@ -106,20 +106,49 @@ C_C_count <- function(smi, start_atom_idx, end_atom_idx){
   return(idx_target_list)
 }
 
-# Calculate strand C number on FA C-Chains.
-.walk_away <- function(smi, start_atom_idx, main_chains_atom_idx, scriptPath){
+# Find atom position of start carbon of branch carbon chain
+# .searchBranch(smi = "C(OCCCCCCCC(CC)(CCC)CCCCC(C)C)C(OC(CCCCCCCCCCCC(C)C)=O)COC(=O)CCCCCCC(CC)CCCCC(C)C",
+#               scriptPath = system.file("python", "SMARTS.py", package = "LipRtPred"))
+# .searchBranch(smi = "C(OCCCCCCCC(CC)(CCC)CCCCC(C)C)C(OC(CCCCCCCCCCCC(C)C)=O)COC(=O)CCCCCCC(OCCC)CCCCC(C)C",
+#               scriptPath = system.file("python", "SMARTS.py", package = "LipRtPred"))
+.searchBranch <- function(smi, scriptPath){
+  branch_C_position <- .smartsMatch(smiles = smi,
+                                  SMARTS = "[C;$([CH0,CH1]);$([$(C(C)(C)(C)),$(C(C)(C)(C)(C))])]",
+                                  scriptPath = scriptPath)[[1]]
+  branch_O_position <- .smartsMatch(smiles = smi,
+                                    SMARTS = "[O;$(O(C)C(C)(C));!$(O-[CX3;$(C=O);$(C-O)])]",
+                                    scriptPath = scriptPath)[[1]]
+  branch_O_position <- .smartsMatch(smiles = smi,
+                                    SMARTS = "[C;$([CH0,CH1]);$(C(C)(C)[O;$(O(C)C(C)(C));!$(O-[CX3;$(C=O);$(C-O)])]C)]",
+                                    scriptPath = scriptPath)[[1]]
+  branch_position <- append(branch_C_position, branch_O_position)
+  return(branch_position)
+}
+
+# Traverse all carbon atoms starting from a specific atom and count them."
+# start_atom_idx: The idx of start atom
+# non_traversable_atom_ids: Vector of idx of atoms that are forbidden to be traversed
+# FA_main_C_position <- .searchCOO(smi = "C(OCCCCCCCC(CC)(CCC)CCCCC(C)C)C(OC(CCCCCCCCCCCC(C)C)=O)COC(=O)CCCCCCC(OCCC)CCCCC(C)C",
+#                                  scriptPath = system.file("python", "SMARTS.py", package = "LipRtPred"))
+# FA_branch_start_C_position <- .searchBranch(smi = "C(OCCCCCCCC(CC)(CCC)CCCCC(C)C)C(OC(CCCCCCCCCCCC(C)C)=O)COC(=O)CCCCCCC(OCCC)CCCCC(C)C",
+#                                             scriptPath = system.file("python", "SMARTS.py", package = "LipRtPred"))
+# Select an atom on FA main chain
+# .walk_away(smi = "C(OCCCCCCCC(CC)(CCC)CCCCC(C)C)C(OC(CCCCCCCCCCCC(C)C)=O)COC(=O)CCCCCCC(OCCC)CCCCC(C)C",
+#            start_atom_idx = FA_branch_start_C_position[[5]],
+#            non_traversable_atom_ids = unlist(FA_main_C_position)[unlist(FA_main_C_position) != FA_branch_start_C_position[[5]]],
+#            scriptPath = system.file("python", "SMARTS.py", package = "LipRtPred"))
+.walk_away <- function(smi, start_atom_idx, non_traversable_atom_ids, scriptPath){
   reticulate::source_python(scriptPath)
-  count <- walk_away_py(smi = smi, start_atom_idx = start_atom_idx, main_chains_atom_idx = main_chains_atom_idx)
+  count <- walk_away_py(smi = smi, start_atom_idx = start_atom_idx, non_traversable_atom_ids = non_traversable_atom_ids)
   return(count)
 }
-# Calculate C number of FA C-Chains.
-#' @rdname LipRtPred_MD
-#' @examples
-#' .cal_c(smi = "C(OC(=O)CCCCCCCCCCCCCCCCC)[C@]([H])(OC(CCCCCCCCCCCCCCC)=O)COC(CCCCCCCCCCC)=O",
-#'        scriptPath = system.file("python", "SMARTS.py", package = "LipRtPred"))
-#' .cal_c(smi = "C(OCCCCCCCCCCCCC(C)C)C(OC(CCCCCCCCCCCC(C)C)=O)COC(=O)CCCCCCCCCCCC(C)C",
-#'        scriptPath = system.file("python", "SMARTS.py", package = "LipRtPred"))
+# Calculate C number of FA chains.
+# .cal_c(smi = "C(OC(=O)CCCCCCC(CC)(CCC)CCCCC(C)C)C(OC(CCCCCCCCCCCC(C)C))COC(=O)CCCCCCC(OCCC)CCCCC(C)C",
+#        scriptPath = system.file("python", "SMARTS.py", package = "LipRtPred"))
+# .cal_c(smi = "C(OCCCCCCCCCCCCC(C)C)C(OC(CCCCCCCCCCCC(C)C)=O)COC(=O)CCCCCCCCCCCC(C)C",
+#        scriptPath = system.file("python", "SMARTS.py", package = "LipRtPred"))
 .cal_c <- function(smi, min_C = 1, max_C = 24, scriptPath){
+  browser()
   FA_position <- .searchCOO(smi, min_C = min_C, max_C = max_C, scriptPath = scriptPath)
   if(length(FA_position) == 0) return(0)
   strand_C_position <- .smartsMatch(smiles = smi, SMARTS = "[C;$([CH0,CH1]);$(C(C)C);!$(C-O);!$(C-N);!$(C-P);!$(C-S)]", scriptPath = scriptPath)[[1]]
