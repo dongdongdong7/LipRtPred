@@ -36,9 +36,34 @@ def walk_away_py(smi, start_atom_idx, non_traversable_atom_ids):
         if neighbor_idx not in visited: # and neighbor.GetSymbol() == 'C'
             count += dfs(neighbor_idx, visited)  # 递归遍历邻居
     return count
-  
+
   mol = Chem.MolFromSmiles(smi)
   return(dfs(atom_idx = start_atom_idx, visited = visited_initial) - 1)
+
+
+def traverse_molecule_py(smi, start_atom_idx, non_traversable_atom_ids):
+  mol = Chem.MolFromSmiles(smi)
+  if mol is None:
+    raise ValueError("Wrong SMILES")
+  
+  if start_atom_idx < 0 or start_atom_idx >= mol.GetNumAtoms():
+    raise ValueError("Wrong start_atom_idx")
+  
+  visited_initial = set(non_traversable_atom_ids)
+  path = []
+  
+  def dfs(atom_idx, visited):
+    if atom_idx in visited:
+      return
+    visited.add(atom_idx)
+    path.append(atom_idx)
+    atom = mol.GetAtomWithIdx(atom_idx)
+    for neighbor in atom.GetNeighbors():
+      dfs(atom_idx = neighbor.GetIdx(), visited = visited)
+  
+  dfs(start_atom_idx, visited = visited_initial)
+  return(path)
+        
   
 def getAtomSymbol_py(smi, atom_idx_list):
   mol = Chem.MolFromSmiles(smi)
