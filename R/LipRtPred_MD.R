@@ -132,7 +132,7 @@ C_C_count <- function(smi, start_atom_idx, end_atom_idx){
   return(branch_position)
 }
 
-# Traverse all carbon atoms starting from a specific atom and count them."
+# Traverse all carbon atoms starting from a specific atom and count them.
 # start_atom_idx: The idx of start atom
 # non_traversable_atom_ids: Vector of idx of atoms that are forbidden to be traversed
 # FA_main_C_position <- .searchCOO(smi = "C(OCCCCCCCC(CC)(CCC)CCCCC(C)C)C(OC(CCCCCCCCCCCC(C)C)=O)COC(=O)CCCCCCC(OCCC)CCCCC(C)C",
@@ -149,6 +149,7 @@ C_C_count <- function(smi, start_atom_idx, end_atom_idx){
   count <- walk_away_py(smi = smi, start_atom_idx = start_atom_idx, non_traversable_atom_ids = non_traversable_atom_ids)
   return(count)
 }
+
 # Calculate C number of FA chains.
 # .cal_c(smi = "C(OC(=O)CCCCCCC(CC)(CCC)CCCCC(C)C)C(OC(CCCCCCCCCCCC(C)C))COC(=O)CCCCCCC(OCCC)CCCCC(C)C",
 #        scriptPath = system.file("python", "SMARTS.py", package = "LipRtPred"))
@@ -177,8 +178,21 @@ C_C_count <- function(smi, start_atom_idx, end_atom_idx){
   }))
   return(as.integer(FA_C_num + branch_C_num))
 }
-# Calculate = number on FA's C-Chains.
-# .cal_d(smi = "C(OC(=O)CCCCCCC/C=C\\CCCCCC)[C@]([H])(OC(CCCCCCC/C=C\\CCCCCC)=O)COC(CCCCCCC/C=C\\CCCCCC)=O",
+
+# Traverse all atoms starting from a specific atom
+# FA_main_C_position <- .searchCOO(smi = "C(OCCCCCCCC/C=C\\CCCCCC)[C@]([H])(OC(CCC(CC=CC)CCCC/C=C\\CCCCCC)=O)COC(CCCCCCC/C=C\\CCCCCC)=O",
+#                                  scriptPath = system.file("python", "SMARTS.py", package = "LipRtPred"))
+# .traverse_molecule(smi = "C(OCCCCCCCC/C=C\\CCCCCC)[C@]([H])(OC(CCC(CC=CC)CCCC/C=C\\CCCCCC)=O)COC(CCCCCCC/C=C\\CCCCCC)=O",
+#                    start_atom_idx = 23,
+#                    non_traversable_atom_ids = unlist(FA_main_C_position)[unlist(FA_main_C_position) != 23],
+#                    scriptPath = system.file("python", "SMARTS.py", package = "LipRtPred"))
+.traverse_molecule <- function(smi, start_atom_idx, non_traversable_atom_ids, scriptPath){
+  reticulate::source_python(scriptPath)
+  traverse_molecule_py(smi = smi, start_atom_idx = as.integer(start_atom_idx), non_traversable_atom_ids = as.integer(non_traversable_atom_ids))
+}
+
+# Calculate = number on FA Chains.
+# .cal_d(smi = "C(OCCCCCCCC/C=C\\CCCCCC)[C@]([H])(OC(CCC(CC=CC)CCCC/C=C\\CCCCCC)=O)COC(CCCCCCC/C=C\\CCCCCC)=O",
 #        scriptPath = system.file("python", "SMARTS.py", package = "LipRtPred"))
 .cal_d <- function(smi, min_C = 1, max_C = 24, scriptPath){
   FA_position <- .searchCOO(smi = smi, min_C = min_C, max_C = max_C, scriptPath = scriptPath)
@@ -186,8 +200,21 @@ C_C_count <- function(smi, start_atom_idx, end_atom_idx){
   FA_position <- unlist(FA_position)
   matchList <- .smartsMatch(smiles = smi, SMARTS = "C=C", scriptPath = scriptPath)[[1]]
   if(length(matchList) == 0) return(0)
+  branch_C_position <- .searchBranch(smi = smi, scriptPath = scriptPath)
+  branch_C_position <- lapply(branch_C_position, function(x){
+    if(x %in% unlist(FA_position)) return(x)
+    else return(NULL)
+  })
+  branch_C_position <- branch_C_position[!sapply(branch_C_position, is.null)]
+  branch_atomIdxList <- lapply(branch_C_position, function(x) {
+    .traverse_molecule(smi,
+                       start_atom_idx = x,
+                       non_traversable_atom_ids = FA_position[FA_position!=x],
+                       scriptPath = scriptPath)
+  })
+  branch_atomIdx <- unlist(branch_atomIdxList)
   matchNum <- sapply(matchList, function(x) {
-    if(all(x %in% FA_position)) return(1)
+    if(all(x %in% c(FA_position, branch_atomIdx))) return(1)
     else return(0)
   })
   return(sum(matchNum))
