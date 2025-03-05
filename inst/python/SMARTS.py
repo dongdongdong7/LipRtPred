@@ -22,14 +22,18 @@ def C_C_count_py(smi, start_atom_idx, end_atom_idx):
   paths = rdmolops.GetShortestPath(mol, start_atom_idx, end_atom_idx) # a tuple with atom index
   return(len(paths) - 2)
 
-def walk_away_py(smi, start_atom_idx, main_chains_atom_idx):
-  visited_initial = set(main_chains_atom_idx)
+def walk_away_py(smi, start_atom_idx, non_traversable_atom_ids):
+  visited_initial = set(non_traversable_atom_ids)
   def dfs(atom_idx, visited):
     visited.add(atom_idx)
-    count = 1  # 当前原子是C原子，所以计数1
-    for neighbor in mol.GetAtomWithIdx(atom_idx).GetNeighbors():
+    atom = mol.GetAtomWithIdx(atom_idx)
+    if atom.GetSymbol() == "C":
+      count = 1  # 当前原子是C原子，所以计数1
+    else:
+      count = 0
+    for neighbor in atom.GetNeighbors():
         neighbor_idx = neighbor.GetIdx()
-        if neighbor_idx not in visited and neighbor.GetSymbol() == 'C':
+        if neighbor_idx not in visited: # and neighbor.GetSymbol() == 'C'
             count += dfs(neighbor_idx, visited)  # 递归遍历邻居
     return count
   
