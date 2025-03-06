@@ -72,3 +72,67 @@ def getAtomSymbol_py(smi, atom_idx_list):
     atom = mol.GetAtomWithIdx(atom_idx)
     symbolList.append(atom.GetSymbol())
   return symbolList
+
+def break_all_rings_bond_py(smi):
+  mol = Chem.MolFromSmiles(smi)
+  if mol is None:
+    raise ValueError("Wrong SMILES")
+  
+  rw_mol = Chem.RWMol(mol)
+  
+  ring_info = rw_mol.GetRingInfo()
+  rings = ring_info.AtomRings()
+  rings = tuple(sorted(rings, key = len))
+  
+  for ring in rings:
+    single_bonds_CC = []
+    single_bonds_Other = []
+    double_bonds_CC = []
+    double_bonds_Other = []
+    triple_bonds_CC = []
+    triple_bonds_Other = []
+    
+    for i in range(len(ring)):
+      for j in range(i + 1, len(ring)):
+        bond = rw_mol.GetBondBetweenAtoms(ring[i],ring[j])
+        if bond is not None:
+          bond_type = bond.GetBondType()
+          atom1 = bond.GetBeginAtom().GetSymbol()
+          atom2 = bond.GetEndAtom().GetSymbol()
+          
+          if bond_type == Chem.BondType.SINGLE:
+            if atom1 == "C" and atom2 == "C":
+              single_bonds_CC.append(bond)
+            else:
+              single_bonds_Other.append(bond)
+          elif bond_type == Chem.BondType.DOUBLE:
+            if atom1 == "C" and atom2 == "C":
+              double_bonds_CC.append(bond)
+            else:
+              double_bonds_Other.append(bond)
+          elif bond_type == Chem.BondType.TRIPLE:
+            if atom1 == "C" and atom2 == "C":
+              triple_bonds_CC.append(bond)
+            else:
+              triple_bonds_Other.append(bond)
+          
+    if single_bonds_CC:
+      bond_to_break = single_bonds_CC[0]
+    elif single_bonds_Other:
+      bond_to_break = single_bonds_Other[0]
+    elif double_bonds_CC:
+      bond_to_break = double_bonds_CC[0]
+    elif double_bonds_Other:
+      bond_to_break = double_bonds_Other[0]
+    elif triple_bonds_CC:
+      bond_to_break = triple_bonds_CC[0]
+    elif triple_bonds_Other:
+      bond_to_break = triple_bonds_Other[0]
+    else:
+      continue
+    
+    rw_mol.RemoveBond(bond_to_break.GetBeginAtom().GetIdx(), bond_to_break.GetEndAtom().GetIdx())
+  
+  mol = rw_mol.GetMol()
+  
+  return(Chem.MolToSmiles(mol))
