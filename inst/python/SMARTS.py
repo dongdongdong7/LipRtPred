@@ -134,5 +134,7 @@ def break_all_rings_bond_py(smi):
     rw_mol.RemoveBond(bond_to_break.GetBeginAtom().GetIdx(), bond_to_break.GetEndAtom().GetIdx())
   
   mol = rw_mol.GetMol()
+  for atom in mol.GetAtoms():
+    atom.SetAtomMapNum(atom.GetIdx())
   
   return(Chem.MolToSmiles(mol))
