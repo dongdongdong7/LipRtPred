@@ -31,13 +31,11 @@ def GetSubstructMatches_py(smis, SMARTS):
     match.append(mol.GetSubstructMatches(Chem.MolFromSmarts(SMARTS)))
   return(match)
 
-# Calculate the shortest distance between two atoms (least number of atoms)
-def GetShortestLength_py(smi, start_atom_idx, end_atom_idx):
+# Get the shortest path between two atoms
+def GetShortestPath_py(smi, start_atom_idx, end_atom_idx):
   mol = Chem.MolFromSmiles(smi)
-  start_atom = mol.GetAtomWithIdx(start_atom_idx)
-  end_atom = mol.GetAtomWithIdx(end_atom_idx)
-  paths = rdmolops.GetShortestPath(mol, start_atom_idx, end_atom_idx)
-  return(len(paths) - 2)
+  path = rdmolops.GetShortestPath(mol, start_atom_idx, end_atom_idx)
+  return(path)
 
 # Get symbol of atoms
 def GetAtomSymbol_py(smi, atom_idx_list):
