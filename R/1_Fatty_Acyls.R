@@ -130,21 +130,16 @@
 # .searchFattyAlcohols(smi = "OC=CCC(/C#CC#CC(O)/C=C/CCCCCCC)=C\\C(=O)O",
 #                      scriptPath = system.file("python", "molecule_operation.py", package = "LipRtPred"))
 .searchFattyAlcohols <- function(smi, scriptPath){
-  atom_count <- .GetNumAtoms(smi = smi, addHs = FALSE, scriptPath = scriptPath)
-  atom_idx_vector <- (1:atom_count) - 1
-  atom_symbol <- .GetAtomSymbol(smi = smi,
-                                atom_idx_vector = atom_idx_vector,
-                                scriptPath = scriptPath)
-  if(all(atom_symbol %in% c("C", "O"))){
-    acyloxy_position <- .searchAcyloxy(smi = smi,
-                                       scriptPath = scriptPath)
-    if(length(acyloxy_position) == 0){
-      matchRes <- .GetSubstructMatches(smis = smi,
-                                       SMARTS = "[C;$([CH2,$([CH;$(C=C)])]);!$(C=O);$(C-O)]-[OH]",
-                                       scriptPath = scriptPath)[[1]]
-    }else{
-      matchRes <- list()
-    }
+  acyloxy_position <- .searchAcyloxy(smi = smi,
+                                     scriptPath = scriptPath)
+  amide_position <- .searchAmide(smi = smi,
+                                 scriptPath = scriptPath)
+  thioester_position <- .searchThioester(smi = smi,
+                                         scriptPath = scriptPath)
+  if(length(acyloxy_position) == 0 & length(amide_position) == 0 & length(thioester_position) == 0){
+    matchRes <- .GetSubstructMatches(smis = smi,
+                                     SMARTS = "[C;$([CH2,$([CH;$(C=C)])]);!$(C=O);$(C-O)]-[OH]",
+                                     scriptPath = scriptPath)[[1]]
   }else{
     matchRes <- list()
   }
@@ -169,4 +164,70 @@
 
 # 5. Fatty aldehydes R-C(=O)H
 # (1) Search fatty aldehydes group
+# .searchFattyAldehydes(smi = "C(CCC/C=C\\C=C/CCCC)(=O)[H]",
+#                       scriptPath = system.file("python", "molecule_operation.py", package = "LipRtPred"))
+.searchFattyAldehydes <- function(smi, scriptPath){
+  acyloxy_position <- .searchAcyloxy(smi = smi,
+                                     scriptPath = scriptPath)
+  amide_position <- .searchAmide(smi = smi,
+                                 scriptPath = scriptPath)
+  thioester_position <- .searchThioester(smi = smi,
+                                         scriptPath = scriptPath)
+  if(length(acyloxy_position) == 0 & length(amide_position) == 0 & length(thioester_position) == 0){
+    matchRes <- .GetSubstructMatches(smis = smi,
+                                     SMARTS = "[CX3;CH;$(C=O);!$(C-O)]=O",
+                                     scriptPath = scriptPath)[[1]]
+  }else{
+    matchRes <- list()
+  }
+  return(matchRes)
+}
 
+# (2) Search fatty aldehydes chain
+# .searchFattyAldehydes_Chain(smi = "C(CCC/C=C\\C=C/CCCC)(=O)[H]",
+#                             scriptPath = system.file("python", "molecule_operation.py", package = "LipRtPred"))
+.searchFattyAldehydes_Chain <- function(smi, scriptPath){
+  fattyAldehydes_position <- .searchFattyAldehydes(smi = smi,
+                                                   scriptPath = scriptPath)
+  lapply(fattyAldehydes_position, function(x) {
+    .TraverseMolecule(smi = smi,
+                      start_atom_idx = x[1],
+                      non_traversable_atom_idx = x[-1],
+                      scriptPath = scriptPath)
+  })
+}
+
+# 6. Fatty nitriles R-C#N
+# (1) Search fatty nitriles group
+# .searchFattyNitries(smi = "N#CCCCCC#CC#CC#CCCCCC#N",
+#                     scriptPath = system.file("python", "molecule_operation.py", package = "LipRtPred"))
+.searchFattyNitries <- function(smi, scriptPath){
+  acyloxy_position <- .searchAcyloxy(smi = smi,
+                                     scriptPath = scriptPath)
+  amide_position <- .searchAmide(smi = smi,
+                                 scriptPath = scriptPath)
+  thioester_position <- .searchThioester(smi = smi,
+                                         scriptPath = scriptPath)
+  if(length(acyloxy_position) == 0 & length(amide_position) == 0 & length(thioester_position) == 0){
+    matchRes <- .GetSubstructMatches(smis = smi,
+                                     SMARTS = "[CX2;$(C#N)]#N",
+                                     scriptPath = scriptPath)[[1]]
+  }else{
+    matchRes <- list()
+  }
+  return(matchRes)
+}
+
+# (2) Search fatty nitriles chain
+# .searchFattyNitries_Chain(smi = "N#CCCCCC#CC#CC#CCCCCC#N",
+#                           scriptPath = system.file("python", "molecule_operation.py", package = "LipRtPred"))
+.searchFattyNitries_Chain <- function(smi, scriptPath){
+  fattyNitries_position <- .searchFattyNitries(smi = smi,
+                                               scriptPath = scriptPath)
+  lapply(fattyNitries_position, function(x) {
+    .TraverseMolecule(smi = smi,
+                      start_atom_idx = x[1],
+                      non_traversable_atom_idx = x[-1],
+                      scriptPath = scriptPath)
+  })
+}
