@@ -124,11 +124,13 @@
 }
 
 # 4. Fatty alcohols R-C-OH
-# (1) Whether a fatty alcohols
-# .whetherFattyAlcohols(smi = "OC=CCC(/C#CC#CC(O)/C=C/CCCCCCC)=C\\CO",
-#                       scriptPath = system.file("python", "molecule_operation.py", package = "LipRtPred"))
-.whetherFattyAlcohols <- function(smi, scriptPath){
-  atom_count <- rcdk::get.atom.count(rcdk::parse.smiles(smiles = smi)[[1]])
+# (1) Search fatty alcohols group
+# .searchFattyAlcohols(smi = "OC=CCC(/C#CC#CC(O)/C=C/CCCCCCC)=C\\CO",
+#                      scriptPath = system.file("python", "molecule_operation.py", package = "LipRtPred"))
+# .searchFattyAlcohols(smi = "OC=CCC(/C#CC#CC(O)/C=C/CCCCCCC)=C\\C(=O)O",
+#                      scriptPath = system.file("python", "molecule_operation.py", package = "LipRtPred"))
+.searchFattyAlcohols <- function(smi, scriptPath){
+  atom_count <- .GetNumAtoms(smi = smi, addHs = FALSE, scriptPath = scriptPath)
   atom_idx_vector <- (1:atom_count) - 1
   atom_symbol <- .GetAtomSymbol(smi = smi,
                                 atom_idx_vector = atom_idx_vector,
@@ -138,39 +140,18 @@
                                        scriptPath = scriptPath)
     if(length(acyloxy_position) == 0){
       matchRes <- .GetSubstructMatches(smis = smi,
-                                       SMARTS = "[C;!$(C=O);$(C-O)]-[OH]", #[C;$([CH2,$([CH;$(C=C)])]);!$(C=O);$(C-O)]-[OH]
+                                       SMARTS = "[C;$([CH2,$([CH;$(C=C)])]);!$(C=O);$(C-O)]-[OH]",
                                        scriptPath = scriptPath)[[1]]
-    }else return(FALSE)
-    if(length(matchRes) >= 1) return(TRUE)
-    else return(FALSE)
-  }else{
-    return(FALSE)
-  }
-}
-
-# (2) Search fatty alcohols group
-# Returns the terminal hydroxyl group first, or all hydroxyl groups if there are none
-# .searchFattyAlcohols(smi = "OC=CCC(/C#CC#CC(O)/C=C/CCCCCCC)=C\\CO",
-#                      scriptPath = system.file("python", "molecule_operation.py", package = "LipRtPred"))
-# .searchFattyAlcohols(smi = "OC=CCC(/C#CC#CC(O)/C=C/CCCCCCC)=C\\C(=O)O",
-#                      scriptPath = system.file("python", "molecule_operation.py", package = "LipRtPred"))
-.searchFattyAlcohols <- function(smi, scriptPath){
-  if(.whetherFattyAlcohols(smi = smi,
-                           scriptPath = scriptPath)){
-    matchRes <- .GetSubstructMatches(smis = smi,
-                                     SMARTS = "[C;$([CH2,$([CH;$(C=C)])]);!$(C=O);$(C-O)]-[OH]",
-                                     scriptPath = scriptPath)[[1]]
-    if(length(matchRes) == 0){
-      matchRes <- .GetSubstructMatches(smis = smi,
-                                       SMARTS = "[C;!$(C=O);$(C-O)]-[OH]",
-                                       scriptPath = scriptPath)[[1]]
+    }else{
+      matchRes <- list()
     }
-    return(matchRes)
+  }else{
+    matchRes <- list()
   }
-  else return(list())
+  return(matchRes)
 }
 
-# (3) Search fatty alcohol chain
+# (2) Search fatty alcohol chain
 # .searchFattyAlcohols_Chain(smi = "OC=CCC(/C#CC#CC(O)/C=C/CCCCCCC)=C\\CO",
 #                            scriptPath = system.file("python", "molecule_operation.py", package = "LipRtPred"))
 # .searchFattyAlcohols_Chain(smi = "C(CC(C)CCCCCCCCCC(=O)O)(=O)O",
@@ -186,5 +167,6 @@
   })
 }
 
-# 5. Fatty aldehydes R1-C(=O)-R2
+# 5. Fatty aldehydes R-C(=O)H
+# (1) Search fatty aldehydes group
 
