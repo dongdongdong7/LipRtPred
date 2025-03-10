@@ -273,46 +273,16 @@
 # .searchHydrocarbons(smi = "CCCC(C)CCCC(C)CCCC(C)CCCC(C)CCCCCCCCCCCCCCCC",
 #                     minium_C = 6,
 #                     scriptPath = system.file("python", "molecule_operation.py", package = "LipRtPred"))
+# .searchHydrocarbons(smi = "CC(C)=CCCC(C)=CCCC(C)=CCCC(C)=CCCC(C)=CCOP(=O)(O)O",
+#                     minium_C = 6,
+#                     scriptPath = system.file("python", "molecule_operation.py", package = "LipRtPred"))
 .searchHydrocarbons <- function(smi, minium_C = 6, scriptPath){
-  atomsNum <- .GetNumAtoms(smi = smi, addHs = FALSE, scriptPath = scriptPath)
-  atomsIdx <- (1:atomsNum) - 1
-  atomsSymbol <- .GetAtomSymbol(smi = smi,
-                                atom_idx_vector = atomsIdx,
-                                scriptPath = scriptPath)
-  pattern <- rep("C", minium_C)
-  pattern <- paste0(pattern, collapse = "~")
-  if(all(atomsSymbol %in% c("C"))){
-    matchRes <- .GetSubstructMatches(smis = smi,
-                                     SMARTS = pattern,
-                                     scriptPath = scriptPath)[[1]]
-    if(length(matchRes) != 0){
-      hydrocarbons_position <- .TraverseMolecule(smi, start_atom_idx = 0,
-                                                 non_traversable_atom_idx = c(),
-                                                 scriptPath = scriptPath)
-    }
-    else{
-      hydrocarbons_position <- list()
-    }
-  }else{
-    hydrocarbons_position <- list()
-  }
-  return(hydrocarbons_position)
-}
-
-# 9. Oxygenated hydrocarbons
-# .searchOxygenatedHydrocarbons(smi = "CC(O)C(=O)CCCC",
-#                               minium_C = 6,
-#                               scriptPath = system.file("python", "molecule_operation.py", package = "LipRtPred"))
-.searchOxygenatedHydrocarbons <- function(smi, minium_C = 6, scriptPath){
-  atomsNum <- .GetNumAtoms(smi = smi, addHs = FALSE, scriptPath = scriptPath)
-  atomsIdx <- (1:atomsNum) - 1
-  atomsSymbol <- .GetAtomSymbol(smi = smi,
-                                atom_idx_vector = atomsIdx,
-                                scriptPath = scriptPath)
-  pattern <- rep("C", minium_C)
-  pattern <- paste0(pattern, collapse = "~")
   acyloxy_position <- .searchAcyloxy(smi = smi,
                                      scriptPath = scriptPath)
+  amide_position <- .searchAmide(smi = smi,
+                                 scriptPath = scriptPath)
+  thioester_position <- .searchThioester(smi = smi,
+                                         scriptPath = scriptPath)
   fattyAlcohols_position <- .searchFattyAlcohols(smi = smi,
                                                  scriptPath = scriptPath)
   fattyAldehydes_position <- .searchFattyAldehydes(smi = smi,
@@ -321,10 +291,13 @@
                                                  scriptPath = scriptPath)
   fattyEthers_position <- .searchFattyEthers(smi = smi,
                                              scriptPath = scriptPath)
-  groupNum <- sum(length(acyloxy_position), length(fattyAlcohols_position),
+  groupNum <- sum(length(amide_position), length(thioester_position),
+                  length(acyloxy_position), length(fattyAlcohols_position),
                   length(fattyAldehydes_position), length(fattyNitries_position),
                   length(fattyEthers_position))
-  if(all(atomsSymbol %in% c("C", "O")) & groupNum == 0){
+  pattern <- rep("C", minium_C)
+  pattern <- paste0(pattern, collapse = "~")
+  if(groupNum == 0){
     matchRes <- .GetSubstructMatches(smis = smi,
                                      SMARTS = pattern,
                                      scriptPath = scriptPath)[[1]]
