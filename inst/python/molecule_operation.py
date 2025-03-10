@@ -13,6 +13,14 @@ from rdkit.Chem import rdmolops
 # atom_idx_list: atom index list
 # non_traversable_atom_idx: list of atom index that are not allowed to be traversed
 
+# Get the number of atom
+def GetNumAtoms_py(smi, addHs = False):
+  mol = Chem.MolFromSmiles(smi)
+  if addHs:
+    mol = Chem.AddHs(mol)
+  num_atom = mol.GetNumAtoms()
+  return num_atom
+  
 # Get SMILES with atom index
 def Get_SMILES_with_index_py(smi):
   mol = Chem.MolFromSmiles(smi)

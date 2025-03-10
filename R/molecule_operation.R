@@ -5,6 +5,7 @@
 # system.file("python", "molecule_operation.py", package = "LipRtPred")
 
 # smi SMILES string
+# addHs: whether add Hs
 # scriptPath: path of molecule_operation.py
 # smis: SMILES string vector
 # SMARTS: SMARTS pattern
@@ -12,6 +13,14 @@
 # end_atom_idx: end atom index
 # atom_idx_vector: atom index vector
 # non_traversable_atom_idx: vector of atom index that are not allowed to be traversed
+
+# Get the number of atom
+# .GetNumAtoms(smi = "CCCCC(=O)O",
+#              scriptPath = system.file("python", "molecule_operation.py", package = "LipRtPred"))
+.GetNumAtoms <- function(smi, addHs = FALSE, scriptPath){
+  reticulate::source_python(scriptPath)
+  GetNumAtoms_py(smi, addHs = addHs)
+}
 
 # Get SMILES with atom index
 # .Get_SMILES_with_index(smi = "CCCCC(=O)O",
