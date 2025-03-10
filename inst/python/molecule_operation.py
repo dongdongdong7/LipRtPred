@@ -102,7 +102,8 @@ def TraverseMolecule_py(smi, start_atom_idx, non_traversable_atom_idx):
   if start_atom_idx < 0 or start_atom_idx >= mol.GetNumAtoms():
     raise ValueError("Wrong start_atom_idx")
 
-  visited_initial = set(non_traversable_atom_idx)
+  visited_initial = set()
+  visited_initial.add(non_traversable_atom_idx)
   path = []
 
   def dfs(atom_idx, visited):
