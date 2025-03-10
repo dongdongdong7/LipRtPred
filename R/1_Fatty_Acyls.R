@@ -6,6 +6,7 @@
 
 # smi SMILES string
 # scriptPath: path of molecule_operation.py
+# minium_C: the minimum C number of hydrocarbons
 
 # 1. Acyloxy R1-C(=O)O-R2
 # (1) Search acyloxy group
@@ -230,4 +231,113 @@
                       non_traversable_atom_idx = x[-1],
                       scriptPath = scriptPath)
   })
+}
+
+# 7. Fatty ethers R1-O-R2
+# (1) Search fatty ethers group
+# .searchFattyEthers(smi = "C(CCCCCCC/C=C\\C=C\\O/C=C/C=C\\CC)",
+#                    scriptPath = system.file("python", "molecule_operation.py", package = "LipRtPred"))
+.searchFattyEthers <- function(smi, scriptPath){
+  acyloxy_position <- .searchAcyloxy(smi = smi,
+                                     scriptPath = scriptPath)
+  amide_position <- .searchAmide(smi = smi,
+                                 scriptPath = scriptPath)
+  thioester_position <- .searchThioester(smi = smi,
+                                         scriptPath = scriptPath)
+  if(length(acyloxy_position) == 0 & length(amide_position) == 0 & length(thioester_position) == 0){
+    matchRes <- .GetSubstructMatches(smis = smi,
+                                     SMARTS = "C-O-C",
+                                     scriptPath = scriptPath)[[1]]
+  }else{
+    matchRes <- list()
+  }
+  return(matchRes)
+}
+
+# (2) Search fatty ethers chain
+# .searchFattyEthers_chain(smi = "C(CCCCCCC/C=C\\C=C\\O/C=C/C=C\\CC)",
+#                          scriptPath = system.file("python", "molecule_operation.py", package = "LipRtPred"))
+.searchFattyEthers_chain <- function(smi, scriptPath){
+  fattyEthers_position <- .searchFattyEthers(smi = smi,
+                                             scriptPath = scriptPath)
+  lapply(fattyEthers_position, function(x) {
+    .TraverseMolecule(smi = smi,
+                      start_atom_idx = x[2],
+                      non_traversable_atom_idx = c(),
+                      scriptPath = scriptPath)
+  })
+}
+
+# 8. Hydrocarbons
+# (1) Search hydrocarbons
+# .searchHydrocarbons(smi = "CCCC(C)CCCC(C)CCCC(C)CCCC(C)CCCCCCCCCCCCCCCC",
+#                     minium_C = 6,
+#                     scriptPath = system.file("python", "molecule_operation.py", package = "LipRtPred"))
+.searchHydrocarbons <- function(smi, minium_C = 6, scriptPath){
+  atomsNum <- .GetNumAtoms(smi = smi, addHs = FALSE, scriptPath = scriptPath)
+  atomsIdx <- (1:atomsNum) - 1
+  atomsSymbol <- .GetAtomSymbol(smi = smi,
+                                atom_idx_vector = atomsIdx,
+                                scriptPath = scriptPath)
+  pattern <- rep("C", minium_C)
+  pattern <- paste0(pattern, collapse = "~")
+  if(all(atomsSymbol %in% c("C"))){
+    matchRes <- .GetSubstructMatches(smis = smi,
+                                     SMARTS = pattern,
+                                     scriptPath = scriptPath)[[1]]
+    if(length(matchRes) != 0){
+      hydrocarbons_position <- .TraverseMolecule(smi, start_atom_idx = 0,
+                                                 non_traversable_atom_idx = c(),
+                                                 scriptPath = scriptPath)
+    }
+    else{
+      hydrocarbons_position <- list()
+    }
+  }else{
+    hydrocarbons_position <- list()
+  }
+  return(hydrocarbons_position)
+}
+
+# 9. Oxygenated hydrocarbons
+# .searchOxygenatedHydrocarbons(smi = "CC(O)C(=O)CCCC",
+#                               minium_C = 6,
+#                               scriptPath = system.file("python", "molecule_operation.py", package = "LipRtPred"))
+.searchOxygenatedHydrocarbons <- function(smi, minium_C = 6, scriptPath){
+  atomsNum <- .GetNumAtoms(smi = smi, addHs = FALSE, scriptPath = scriptPath)
+  atomsIdx <- (1:atomsNum) - 1
+  atomsSymbol <- .GetAtomSymbol(smi = smi,
+                                atom_idx_vector = atomsIdx,
+                                scriptPath = scriptPath)
+  pattern <- rep("C", minium_C)
+  pattern <- paste0(pattern, collapse = "~")
+  acyloxy_position <- .searchAcyloxy(smi = smi,
+                                     scriptPath = scriptPath)
+  fattyAlcohols_position <- .searchFattyAlcohols(smi = smi,
+                                                 scriptPath = scriptPath)
+  fattyAldehydes_position <- .searchFattyAldehydes(smi = smi,
+                                                   scriptPath = scriptPath)
+  fattyNitries_position <- .searchFattyAldehydes(smi = smi,
+                                                 scriptPath = scriptPath)
+  fattyEthers_position <- .searchFattyEthers(smi = smi,
+                                             scriptPath = scriptPath)
+  groupNum <- sum(length(acyloxy_position), length(fattyAlcohols_position),
+                  length(fattyAldehydes_position), length(fattyNitries_position),
+                  length(fattyEthers_position))
+  if(all(atomsSymbol %in% c("C", "O")) & groupNum == 0){
+    matchRes <- .GetSubstructMatches(smis = smi,
+                                     SMARTS = pattern,
+                                     scriptPath = scriptPath)[[1]]
+    if(length(matchRes) != 0){
+      hydrocarbons_position <- .TraverseMolecule(smi, start_atom_idx = 0,
+                                                 non_traversable_atom_idx = c(),
+                                                 scriptPath = scriptPath)
+    }
+    else{
+      hydrocarbons_position <- list()
+    }
+  }else{
+    hydrocarbons_position <- list()
+  }
+  return(hydrocarbons_position)
 }
