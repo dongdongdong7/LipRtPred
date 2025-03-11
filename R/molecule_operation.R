@@ -71,5 +71,5 @@
   reticulate::source_python(scriptPath)
   TraverseMolecule_py(smi = smi,
                       start_atom_idx = as.integer(start_atom_idx),
-                      non_traversable_atom_idx = as.integer(non_traversable_atom_idx))
+                      non_traversable_atom_idx = as.vector(as.integer(non_traversable_atom_idx)))
 }
