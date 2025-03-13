@@ -14,7 +14,7 @@
 #                scriptPath = system.file("python", "molecule_operation.py", package = "LipRtPred"))
 .searchAcyloxy <- function(smi, scriptPath){
   .GetSubstructMatches(smis = smi,
-                       SMARTS = "[CX3;$(C=O);$(C-O)](=O)O",
+                       SMARTS = "[CX3;$(C=O);$(C-O)](=O)[OX2]",
                        scriptPath = scriptPath)[[1]]
 }
 
@@ -313,4 +313,14 @@
     hydrocarbons_position <- list()
   }
   return(hydrocarbons_position)
+}
+
+# 9. Carnitine
+# (1) Search carnitine
+# .searchCarnitine(smi = "O=C(O[C@](CC([O-])=O)(C[N+](C)(C)C)[H])CCCCC",
+#                  scriptPath = system.file("python", "molecule_operation.py", package = "LipRtPred"))
+.searchCarnitine <- function(smi, scriptPath){
+  .GetSubstructMatches(smis = smi,
+                       SMARTS = "[N+]([CH3])([CH3])([CH3])[CH2][CX4;CH](O)[CH2][CX3](=O)[O-]",
+                       scriptPath = scriptPath)[[1]]
 }
