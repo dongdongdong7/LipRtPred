@@ -8,23 +8,23 @@
 # scriptPath: path of molecule_operation.py
 
 # 1. Fatty Chain Head
-# (1) Search sterol skeleton
-# .searchSterolSkeleton(smi = "C1C[C@H](O)C(C)(C)[C@]2([H])CCC3[C@]4(C)CC[C@]([H])([C@H](C)CCC(=C)C(C)C)[C@@]4(C)CCC=3[C@@]12C",
-#                       scriptPath = system.file("python", "molecule_operation.py", package = "LipRtPred"))
-# .searchSterolSkeleton(smi = "C1C2[C@@]3([H])CC[C@]4(C)C(=O)CC[C@@]4([H])[C@]3([H])CCC=2C=C(O)C=1",
-#                       scriptPath = system.file("python", "molecule_operation.py", package = "LipRtPred"))
-.searchSterolSkeleton <- function(smi, scriptPath){
+# (1) Search Steroid skeleton
+# .searchSteroidSkeleton(smi = "C1C[C@H](O)C(C)(C)[C@]2([H])CCC3[C@]4(C)CC[C@]([H])([C@H](C)CCC(=C)C(C)C)[C@@]4(C)CCC=3[C@@]12C",
+#                        scriptPath = system.file("python", "molecule_operation.py", package = "LipRtPred"))
+# .searchSteroidSkeleton(smi = "C1C2[C@@]3([H])CC[C@]4(C)C(=O)CC[C@@]4([H])[C@]3([H])CCC=2C=C(O)C=1",
+#                        scriptPath = system.file("python", "molecule_operation.py", package = "LipRtPred"))
+.searchSteroidSkeleton <- function(smi, scriptPath){
   .GetSubstructMatches(smis = smi,
                        SMARTS = "[#6]1~[#6]~[#6]~[#6]2~[#6]3~[#6]~[#6]~[#6]4~[#6]~[#6]~[#6]~[#6]~4[#6]~3~[#6]~[#6]~[#6]~2[#6]~1",
                        scriptPath = scriptPath)[[1]]
 }
 
-# (2) Search sterol skeleton derivative
-# .searchSterolSkeleton_Derivative(smi = "C1C[C@H](O)C(C)(C)[C@]2([H])CCC3[C@]4(C)CC[C@]([H])([C@H](C)CCC(=C)C(C)C)[C@@]4(C)CCC=3[C@@]12C",
-#                                  scriptPath = system.file("python", "molecule_operation.py", package = "LipRtPred"))
-.searchSterolSkeleton_Derivative <- function(smi, scriptPath){
-  sterolSkeleton_position <- .searchSterolSkeleton(smi = smi, scriptPath = scriptPath)
-  lapply(sterolSkeleton_position, function(x) {
+# (2) Search Steroid skeleton derivative
+# .searchSteroidSkeleton_Derivative(smi = "C1C[C@H](O)C(C)(C)[C@]2([H])CCC3[C@]4(C)CC[C@]([H])([C@H](C)CCC(=C)C(C)C)[C@@]4(C)CCC=3[C@@]12C",
+#                                   scriptPath = system.file("python", "molecule_operation.py", package = "LipRtPred"))
+.searchSteroidSkeleton_Derivative <- function(smi, scriptPath){
+  steroidSkeleton_position <- .searchSteroidSkeleton(smi = smi, scriptPath = scriptPath)
+  lapply(steroidSkeleton_position, function(x) {
     c(x[1],
       .TraverseMolecule(smi = smi,
                         start_atom_idx = x[2],
@@ -34,12 +34,12 @@
   })
 }
 
-# (3) Search sterol skeleton Chain 1
-# .searchSterolSkeleton_Chain1(smi = "C1[C@H](OC(=O)CCCCCCCCCCC)CC2=CC[C@@]3([H])[C@]4([H])CC[C@]([H])([C@]([H])(C)CCCC(C)C)[C@@]4(C)CC[C@]3([H])[C@@]2(C)C1",
-#                              scriptPath = system.file("python", "molecule_operation.py", package = "LipRtPred"))
-.searchSterolSkeleton_Chain1 <- function(smi, scriptPath){
-  sterolSkeleton_position <- .searchSterolSkeleton(smi = smi, scriptPath = scriptPath)
-  lapply(sterolSkeleton_position, function(x) {
+# (3) Search steroid skeleton Chain 1
+# .searchSteroidSkeleton_Chain1(smi = "C1[C@H](OC(=O)CCCCCCCCCCC)CC2=CC[C@@]3([H])[C@]4([H])CC[C@]([H])([C@]([H])(C)CCCC(C)C)[C@@]4(C)CC[C@]3([H])[C@@]2(C)C1",
+#                               scriptPath = system.file("python", "molecule_operation.py", package = "LipRtPred"))
+.searchSteroidSkeleton_Chain1 <- function(smi, scriptPath){
+  steroidSkeleton_position <- .searchSteroidSkeleton(smi = smi, scriptPath = scriptPath)
+  lapply(steroidSkeleton_position, function(x) {
     .TraverseMolecule(smi = smi,
                       start_atom_idx = x[1],
                       non_traversable_atom_idx = x[-1],
@@ -47,15 +47,51 @@
   })
 }
 
-# (4) Search sterol skeleton Chain 2
-# .searchSterolSkeleton_Chain2(smi = "C1[C@]2(C)[C@@]3([H])CC[C@]4(C)[C@@]([H])([C@]([H])(C)CC/C(=C/CC)/C(C)C)CC[C@@]4([H])[C@]3([H])CC=C2C[C@@H](O)C1",
+# (4) Search steroid skeleton Chain 2
+# .searchSteroidSkeleton_Chain2(smi = "C1[C@]2(C)[C@@]3([H])CC[C@]4(C)[C@@]([H])([C@]([H])(C)CC/C(=C/CC)/C(C)C)CC[C@@]4([H])[C@]3([H])CC=C2C[C@@H](O)C1",
 #                              scriptPath = system.file("python", "molecule_operation.py", package = "LipRtPred"))
-.searchSterolSkeleton_Chain2 <- function(smi, scriptPath){
-  sterolSkeleton_position <- .searchSterolSkeleton(smi = smi, scriptPath = scriptPath)
-  lapply(sterolSkeleton_position, function(x) {
+.searchSteroidSkeleton_Chain2 <- function(smi, scriptPath){
+  steroidSkeleton_position <- .searchsteroidSkeleton(smi = smi, scriptPath = scriptPath)
+  lapply(steroidSkeleton_position, function(x) {
     .TraverseMolecule(smi = smi,
                       start_atom_idx = x[9],
                       non_traversable_atom_idx = x[-9],
+                      scriptPath = scriptPath)
+  })
+}
+
+# (5) Search secosteroid skeleton
+# .searchSecosteroidSkeleton(smi = "C1=C(C)C(CC[C@@]2(O)[C@]3([H])CC[C@@]([H])([C@@]3(C)CC[C@H]2O)[C@]([H])(C)CC/C(=C/C)/C(C)C)=CC(O)=C1",
+#                            scriptPath = system.file("python", "molecule_operation.py", package = "LipRtPred"))
+.searchSecosteroidSkeleton <- function(smi, scriptPath){
+  .GetSubstructMatches(smis = smi,
+                       SMARTS = "[#6](O)(~[#6]~[#6]~[#6]1)~[#6]~[#6]~1~[#6]~[#6]~[#6]2~[#6]~[#6]~[#6]~[#6]3~[#6]~[#6]~[#6]~[#6]~2~3", # 15
+                       scriptPath = scriptPath)[[1]]
+}
+
+# (6) Search secosteroid skeleton derivative
+# .searchSecosteroidSkeleton_Derivative(smi = "C1C(=C)/C(=C/C=C2\\[C@]3([H])CC[C@@]([H])([C@@]3(C)CCC\\2)[C@@](C)([H])CCCC(O)(C)C)/C[C@H](O)C1",
+#                                       scriptPath = system.file("python", "molecule_operation.py", package = "LipRtPred"))
+.searchSecosteroidSkeleton_Derivative <- function(smi, scriptPath){
+  secosteroidSkeleton_position <- .searchSecosteroidSkeleton(smi = smi, scriptPath = scriptPath)
+  lapply(secosteroidSkeleton_position, function(x) {
+    c(.TraverseMolecule(smi = smi,
+                        start_atom_idx = x[1],
+                        non_traversable_atom_idx = x[15],
+                        scriptPath = scriptPath),
+      x[15])
+  })
+}
+
+# (7) Search secosteroid skeleton chain
+# .searchSecosteroidSkeleton_Chain(smi = "C1=C(C)C(CC[C@@]2(O)[C@]3([H])CC[C@@]([H])([C@@]3(C)CC[C@H]2O)[C@]([H])(C)CC/C(=C/C)/C(C)C)=CC(O)=C1",
+#                                  scriptPath = system.file("python", "molecule_operation.py", package = "LipRtPred"))
+.searchSecosteroidSkeleton_Chain <- function(smi, scriptPath){
+  secosteroidSkeleton_position <- .searchSecosteroidSkeleton(smi = smi, scriptPath = scriptPath)
+  lapply(secosteroidSkeleton_position, function(x) {
+    .TraverseMolecule(smi = smi,
+                      start_atom_idx = x[15],
+                      non_traversable_atom_idx = x[-15],
                       scriptPath = scriptPath)
   })
 }
