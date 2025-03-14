@@ -174,7 +174,7 @@
 #                scriptPath = system.file("python", "molecule_operation.py", package = "LipRtPred"))
 .searchPentose <- function(smi, scriptPath){
   .GetSubstructMatches(smis = smi,
-                       SMARTS = "C(O)C1C(O)C(O)C(O)O1",
+                       SMARTS = "C(O)C1C([O,N])C([O,N])C([O,N])O1",
                        scriptPath = scriptPath)[[1]]
 }
 # (2) Hexose
@@ -182,6 +182,6 @@
 #               scriptPath = system.file("python", "molecule_operation.py", package = "LipRtPred"))
 .searchHexose <- function(smi, scriptPath){
   .GetSubstructMatches(smis = smi,
-                       SMARTS = "C(O)C1C(O)C(O)C(O)C(O)O1",
+                       SMARTS = "C(O)C1C([O,N])C([O,N])C([O,N])C([O,N])O1",
                        scriptPath = scriptPath)[[1]]
 }
