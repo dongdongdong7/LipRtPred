@@ -17,7 +17,7 @@
 #                          scriptPath = system.file("python", "molecule_operation.py", package = "LipRtPred"))
 .searchGlycerolPhosphate <- function(smi, scriptPath){
   .GetSubstructMatches(smis = smi,
-                       SMARTS = "C(O)C(~[O;$(O=C),$(O-C)])C(OP(=O)(O)-*)",
+                       SMARTS = "[CH2;$(C-O)](O)[CH;$(C-O)](~[O;$(O=C),$(O-C)])[CH2;$(C-O)](OP(=O)(O)-*)",
                        scriptPath = scriptPath)[[1]]
 }
 
