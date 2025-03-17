@@ -7,7 +7,21 @@
 # smi SMILES string
 # scriptPath: path of molecule_operation.py
 
-# 1. Phosphate group
+# 1. Glycerol Phosphate
+# (1) Search glycerol phosphate
+# .searchGlycerolPhosphate(smi = "[C@]([H])(OC(CCCCCCC/C=C\\CCCCCCCC)=O)(COP(CCN)(=O)O)COC(CCCCCCCCCCCCCCC)=O",
+#                          scriptPath = system.file("python", "molecule_operation.py", package = "LipRtPred"))
+# .searchGlycerolPhosphate(smi = "C(=O)(COP(=O)(O)O)COCCCCCCCCCCCCCCCC",
+#                          scriptPath = system.file("python", "molecule_operation.py", package = "LipRtPred"))
+# .searchGlycerolPhosphate(smi = "C(OC(CCCCCCCCCCCCCCC)=O)C(=O)COP(=O)(O)O",
+#                          scriptPath = system.file("python", "molecule_operation.py", package = "LipRtPred"))
+.searchGlycerolPhosphate <- function(smi, scriptPath){
+  .GetSubstructMatches(smis = smi,
+                       SMARTS = "C(O)C(~[O;$(O=C),$(O-C)])C(OP(=O)(O)-*)",
+                       scriptPath = scriptPath)[[1]]
+}
+
+# 2. Phosphate group
 # (1) Search phosphate group
 # .searchPhosphate(smi = "C(O[C@H]1[C@H](O)[C@@H](O)[C@H](O)[C@@H](COP(=O)(O)OCCN)O1)[C@]([H])(OC(CCCCCCC/C=C\\CCCCCC)=O)CO/C=C\\CCCCCCCCCCCCCC",
 #                  scriptPath = system.file("python", "molecule_operation.py", package = "LipRtPred"))
