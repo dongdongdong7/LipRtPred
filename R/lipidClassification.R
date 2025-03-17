@@ -50,7 +50,7 @@
   if(length(fattyAldehyde_position) != 0) return("Fatty Aldehyde")
 
   fattyNitrile <- .searchFattyNitriles(smi = smi, scriptPath = scriptPath)
-  if(length(fattyNitrile) != 0) return("Fatty nitrile")
+  if(length(fattyNitrile) != 0) return("Fatty Nitrile")
 
   fattyEther_position <- .searchFattyEthers(smi = smi, scriptPath = scriptPath)
   if(length(fattyEther_position) != 0) return("Fatty Ether")
