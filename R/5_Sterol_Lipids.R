@@ -63,10 +63,19 @@
 # (5) Search secosteroid skeleton
 # .searchSecosteroidSkeleton(smi = "C1=C(C)C(CC[C@@]2(O)[C@]3([H])CC[C@@]([H])([C@@]3(C)CC[C@H]2O)[C@]([H])(C)CC/C(=C/C)/C(C)C)=CC(O)=C1",
 #                            scriptPath = system.file("python", "molecule_operation.py", package = "LipRtPred"))
+# .searchSecosteroidSkeleton(smi = "C1[C@@H](O)C[C@]2([H])CC[C@@]3([H])[C@]4([H])CCC(=O)[C@@]4(C)CC[C@]3([H])[C@@]2(C)C1",
+#                            scriptPath = system.file("python", "molecule_operation.py", package = "LipRtPred"))
 .searchSecosteroidSkeleton <- function(smi, scriptPath){
-  .GetSubstructMatches(smis = smi,
-                       SMARTS = "[#6](O)(~[#6]~[#6]~[#6]1)~[#6]~[#6]~1~[#6]~[#6]~[#6]2~[#6]~[#6]~[#6]~[#6]3~[#6]~[#6]~[#6]~[#6]~2~3", # 15
-                       scriptPath = scriptPath)[[1]]
+  steroidSkeletion_position <- .searchSteroidSkeleton(smi = smi, scriptPath = scriptPath)
+  secosteroidSkeletion_position <- .GetSubstructMatches(smis = smi,
+                                                        SMARTS = "[#6](O)(~[#6]~[#6]~[#6]1)~[#6]~[#6]~1~[#6]~[#6]~[#6]2~[#6]~[#6]~[#6]~[#6]3~[#6]~[#6]~[#6]~[#6]~2~3", # 15
+                                                        scriptPath = scriptPath)[[1]]
+  if(length(secosteroidSkeletion_position) == 0) return(secosteroidSkeletion_position)
+  secosteroidSkeletion_position <- secosteroidSkeletion_position[sapply(secosteroidSkeletion_position, function(x) {
+    if(all(x[-2] %in% unlist(steroidSkeletion_position))) return(FALSE)
+    else return(TRUE)
+  })]
+  return(secosteroidSkeletion_position)
 }
 
 # (6) Search secosteroid skeleton derivative
