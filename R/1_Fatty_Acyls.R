@@ -200,9 +200,9 @@
 
 # 6. Fatty nitriles R-C#N
 # (1) Search fatty nitriles group
-# .searchFattyNitries(smi = "N#CCCCCC#CC#CC#CCCCCC#N",
+# .searchFattyNitriles(smi = "N#CCCCCC#CC#CC#CCCCCC#N",
 #                     scriptPath = system.file("python", "molecule_operation.py", package = "LipRtPred"))
-.searchFattyNitries <- function(smi, scriptPath){
+.searchFattyNitriles <- function(smi, scriptPath){
   acyloxy_position <- .searchAcyloxy(smi = smi,
                                      scriptPath = scriptPath)
   amide_position <- .searchAmide(smi = smi,
@@ -220,9 +220,9 @@
 }
 
 # (2) Search fatty nitriles chain
-# .searchFattyNitries_Chain(smi = "N#CCCCCC#CC#CC#CCCCCC#N",
+# .searchFattyNitriles_Chain(smi = "N#CCCCCC#CC#CC#CCCCCC#N",
 #                           scriptPath = system.file("python", "molecule_operation.py", package = "LipRtPred"))
-.searchFattyNitries_Chain <- function(smi, scriptPath){
+.searchFattyNitriles_Chain <- function(smi, scriptPath){
   fattyNitries_position <- .searchFattyNitries(smi = smi,
                                                scriptPath = scriptPath)
   lapply(fattyNitries_position, function(x) {
