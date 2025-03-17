@@ -55,13 +55,15 @@
 # (4) Search glycerol ether
 # .searchGlycerolEther(smi = "OC[C@]([H])(O)CO/C=C\\C#C/C=C\\CCCCCCC(C)C",
 #                      scriptPath = system.file("python", "molecule_operation.py", package = "LipRtPred"))
+# .searchGlycerolEther(smi = "[C@]([H])(OC(CCCCCCC/C=C\\CCCCCCCC)=O)(COP(CC[N+](C)(C)C)(=O)[O-])COC(CCCCCCCCCCCCCCC)=O",
+#                      scriptPath = system.file("python", "molecule_operation.py", package = "LipRtPred"))
 .searchGlycerolEther <- function(smi, scriptPath){
   glycerol_position <- .searchGlycerol(smi = smi, scriptPath = scriptPath)
   O_sn1 <- sapply(glycerol_position, function(x) {x[2]})
   O_sn2 <- sapply(glycerol_position, function(x) {x[4]})
   O_sn3 <- sapply(glycerol_position, function(x) {x[6]})
   ethers_position <- .GetSubstructMatches(smis = smi,
-                                          SMARTS = "C-O-[CH2;$(C-[CH;$(C-O)]-[CH2;$(C-O)])]",
+                                          SMARTS = "[CH2,CH3]-O-[C;!$(C=O)]",
                                           scriptPath = scriptPath)[[1]]
   sn_info <- sapply(ethers_position, function(x) {
     if(x[2] %in% O_sn1) return("sn1")
@@ -106,6 +108,7 @@
   dihydroxyacetone_position <- .searchDihydroxyacetone(smi = smi,
                                                        scriptPath = scriptPath)
   acyloxy_position <- .searchAcyloxy(smi = smi, scriptPath = scriptPath)
+  if(length(acyloxy_position) == 0) return(list())
   dihydroxyacetoneEster_logical <- sapply(acyloxy_position, function(x) {
     if(x[3] %in% unlist(dihydroxyacetone_position)) return(TRUE)
     else return(FALSE)
@@ -134,8 +137,9 @@
   dihydroxyacetone_position <- .searchDihydroxyacetone(smi = smi,
                                                        scriptPath = scriptPath)
   dihydroxyacetoneEther_position <- .GetSubstructMatches(smis = smi,
-                                                         SMARTS = "C-O-[C;$(C-C(=O)-C-O)]",
+                                                         SMARTS = "[C;!$(C=O)]-O-[C;$(C-C(=O)-C-O)]",
                                                          scriptPath = scriptPath)[[1]]
+  if(length(dihydroxyacetoneEther_position) == 0) return(list())
   dihydroxyacetoneEther_logical <- sapply(dihydroxyacetoneEther_position, function(x) {
     if(all(x[c(2,3)] %in% unlist(dihydroxyacetone_position))) return(TRUE)
     else return(FALSE)
