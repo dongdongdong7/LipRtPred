@@ -168,10 +168,39 @@
   return(main_chains)
 }
 
+# Search GP main chains
 # .searchGP_MainChains(smi = "O(CC[C@H](C)CCC[C@H](C)CCC[C@H](C)CCCC(C)C)C[C@]([H])(OCC[C@H](C)CCC[C@H](C)CCC[C@H](C)CCCC(C)C)COP(O)(=O)OC[C@]([H])(O)COP(OC)(O)=O",
 #                      scriptPath = system.file("python", "molecule_operation.py", package = "LipRtPred"))
+# .searchGP_MainChains(smi = "O(P(OC[C@@]1([H])OCC[C@H](C)CCC[C@H](C)CCC[C@H](C)CCC[C@H](C)CC[C@@H](C)CCC[C@@H](C)CCC[C@@H](C)CCC[C@@H](C)CCOC[C@]([H])(OCC[C@H](C)CCC[C@H](C)CCC[C@H](C)CCC[C@@H](CC[C@@H](C)CCC[C@@H](C)CCC[C@@H](C)CCC[C@@H](C)CCOC1)C)CO)(O)=O)CCN",
+#                      scriptPath = system.file("python", "molecule_operation.py", package = "LipRtPred"))
+# .searchGP_MainChains(smi = "C([C@@]1([H])OCC[C@H](C)CCC[C@H](C)CCC[C@H](C)CCC[C@@H](CC[C@@H](C)CCC[C@@H](C)CCC[C@@H](C)CCC[C@@H](C)CCOC[C@]([H])(OCC[C@H](C)CCC[C@H](C)CCC[C@H](C)CCC[C@H](C)CC[C@@H](C)CCC[C@@H](C)CCC[C@@H](C)CCC[C@@H](C)CCOC1)COP(O)(=O)OCCN)C)(C(O)(CO)C(O)C(O)C(O)CO)O",
+#                      scriptPath = system.file("python", "molecule_operation.py", package = "LipRtPred"))
+# .searchGP_MainChains(smi = "[C@](COP(=O)(O)OCCNC[C@@]1(O)OC[C@@H](O)[C@@H](O)[C@@H]1O)([H])(OC(CCCCCCC/C=C\\C/C=C\\CCCCC)=O)CO/C=C\\CCCCCCCCCCCCCC",
+#                      scriptPath = system.file("python", "molecule_operation.py", package = "LipRtPred"))
 .searchGP_MainChains <- function(smi, scriptPath){
-  browser()
+  main_class <- .lipidClassification(smi = smi, scriptPath = scriptPath)
+  if(main_class != "Glycerophospholipid") return(list())
+  glycerolPhosphate_position <- .searchGlycerolPhosphate(smi = smi, scriptPath = scriptPath)
+  glycerolEsterChain_position <- .searchGlycerolEster_Chain(smi = smi, scriptPath = scriptPath)
+  glycerolEtherChain_position <- .searchGlycerolEther_Chain(smi = smi, scriptPath = scriptPath)
+  dhaEsterChain_position <- .searchDihydroxyacetoneEster_Chain(smi = smi, scriptPath = scriptPath)
+  dhaEtherChain_position <- .searchDihydroxyacetoneEther_Chain(smi = smi, scriptPath = scriptPath)
+  main_chains <- c(glycerolEsterChain_position, glycerolEtherChain_position, dhaEsterChain_position, dhaEtherChain_position)
+  for(i in 1:length(main_chains)){
+    x <- main_chains[[i]]
+    if(all(x == "none")) next
+    for(j in (1:length(main_chains))[-i]){
+      y <- main_chains[[j]]
+      if(all(y == "none")) next
+      if(any(y %in% x)) main_chains[[j]] <- "none"
+    }
+  }
+  main_chains <- lapply(main_chains, function(x){
+    if(all(x == "none")) return(NULL)
+    else return(x)
+  })
+  main_chains <- main_chains[!sapply(main_chains, is.null)]
+  return(main_chains)
 }
 
 # .calCQS_FP(smi = "[C@@H]1([C@H](O)[C@H](OP(=O)(O)O)[C@@H](COP(O)(=O)OP(O)(=O)OCC(C)([C@@H](O)C(=O)NCCC(=O)NCCSC(=O)C/C=C\\CC(O)=O)C)O1)N1C=NC2C(N)=NC=NC1=2",
