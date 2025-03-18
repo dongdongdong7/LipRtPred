@@ -203,6 +203,38 @@
   return(main_chains)
 }
 
+# Search SP main chains
+# .searchSP_MainChains(smi = "C(OC(=O)CCCCCCCCCCCCCCC)[C@]([H])(NC(CCCCCCCCCCCCCCC)=O)[C@H](O)/C=C/CCCCCCCCCCCCC",
+#                      scriptPath = system.file("python", "molecule_operation.py", package = "LipRtPred"))
+# .searchSP_MainChains(smi = "[C@](C)([H])(NC(CCCCCCCCCCCCCCCCCCCCCCC)=O)[C@]([H])(O)CCCCCCCCCCCCCCC",
+#                      scriptPath = system.file("python", "molecule_operation.py", package = "LipRtPred"))
+.searchSP_MainChains <- function(smi, scriptPath){
+  main_class <- .lipidClassification(smi = smi, scriptPath = scriptPath)
+  if(main_class != "Sphingolipid") return(list())
+  sphingosine_position <- .searchSphingosine(smi = smi, scriptPath = scriptPath)
+  spisulosine_position <- .searchSpisulosine(smi = smi, scriptPath = scriptPath)
+  sphingosineC_chain_position <- .searchSphingosineC_Chain(smi = smi, scriptPath = scriptPath)
+  sphingosineN_chain_position <- .searchSphingosineN_Chain(smi = smi, scriptPath = scriptPath)
+  spisulosineC_chain_position <- .searchSpisulosineC_Chain(smi = smi, scriptPath = scriptPath)
+  spisulosineN_chain_position <- .searchSpisulosineN_Chain(smi = smi, scriptPath = scriptPath)
+  acyloxy_position <- .searchAcyloxy(smi = smi, scriptPath = scriptPath)
+  acyloxy_acylChain_position <- .searchAcyloxy_AcylChain(smi = smi, scriptPath = scriptPath)
+  if(length(acyloxy_acylChain_position) != 0){
+    acyloxy_acylChain_position <- lapply(1:length(acyloxy_acylChain_position), function(i) {
+      unique(c(acyloxy_position[[i]], acyloxy_acylChain_position[[i]]))
+    })
+  }
+  SP_other_chain_position <- lapply(acyloxy_acylChain_position, function(x){
+    if(x[3] %in% unlist(c(sphingosine_position, spisulosine_position))){
+      return(x[-c(2,3)])
+    }else{
+      return(NULL)
+    }
+  })
+  main_chains <- c(sphingosineC_chain_position, sphingosineN_chain_position, spisulosineC_chain_position, spisulosineN_chain_position, SP_other_chain_position)
+  return(main_chains)
+}
+
 # .calCQS_FP(smi = "[C@@H]1([C@H](O)[C@H](OP(=O)(O)O)[C@@H](COP(O)(=O)OP(O)(=O)OCC(C)([C@@H](O)C(=O)NCCC(=O)NCCSC(=O)C/C=C\\CC(O)=O)C)O1)N1C=NC2C(N)=NC=NC1=2",
 #            scriptPath = system.file("python", "molecule_operation.py", package = "LipRtPred"))
 .calCQS_FP <- function(smi, scriptPath){
