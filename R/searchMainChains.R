@@ -235,76 +235,52 @@
   return(main_chains)
 }
 
-# .calCQS_FP(smi = "[C@@H]1([C@H](O)[C@H](OP(=O)(O)O)[C@@H](COP(O)(=O)OP(O)(=O)OCC(C)([C@@H](O)C(=O)NCCC(=O)NCCSC(=O)C/C=C\\CC(O)=O)C)O1)N1C=NC2C(N)=NC=NC1=2",
-#            scriptPath = system.file("python", "molecule_operation.py", package = "LipRtPred"))
-.calCQS_FP <- function(smi, scriptPath){
-  .lipidClassification(smi = smi, scriptPath = scriptPath)
+# Search ST main chains
+# .searchST_MainChains(smi = "C1[C@H](O)[C@H](O[C@H]2[C@H](O)[C@@H](O)[C@H](O)[C@@H](CO)O2)CC2=C(O)C(=O)C3=C(CC[C@]4(C3=CC[C@]4([H])[C@](O)(C)[C@H](O)CCC(C)C)C)[C@]21C",
+#                      scriptPath = system.file("python", "molecule_operation.py", package = "LipRtPred"))
+# .searchST_MainChains(smi = "[C@]12(CC=C3C[C@@H](OC(CCCCC/C=C\\CCCCCCCCC)=O)CC[C@]3(C)[C@@]1([H])CC[C@]1(C)[C@@]([H])([C@@](C)([H])CCCC(C)C)CC[C@@]21[H])[H]",
+#                      scriptPath = system.file("python", "molecule_operation.py", package = "LipRtPred"))
+# .searchST_MainChains(smi = "C1C(=C)/C(=C\\C=C2\\[C@]3([H])CC[C@@]([H])([C@@]3(C)CCC\\2)[C@]([H])(C)/C=C/[C@H](C)C(C)C)/C[C@@H](O)C1",
+#                      scriptPath = system.file("python", "molecule_operation.py", package = "LipRtPred"))
+# .searchST_MainChains(smi = "C1[C@]2(C)[C@@]3([H])CC[C@]4(C)[C@@]([H])([C@]([H])(C)CCC(O)=O)CC[C@@]4([H])[C@]3([H])C(=O)C[C@@]2([H])CCC1",
+#                      scriptPath = system.file("python", "molecule_operation.py", package = "LipRtPred"))
+.searchST_MainChains <- function(smi, scriptPath){
+  main_class <- .lipidClassification(smi = smi, scriptPath = scriptPath)
+  if(main_class != "Sterol") return(list())
+  steroidSkeleton_chain1 <- .searchSteroidSkeleton_Chain1(smi = smi, scriptPath = scriptPath)
+  steroidSkeleton_chain2 <- .searchSteroidSkeleton_Chain2(smi = smi, scriptPath = scriptPath)
+  steroidSkeleton_derivative <- .searchSteroidSkeleton_Derivative(smi = smi, scriptPath = scriptPath)
+  secosteroidSkeleton_chain <- .searchSecosteroidSkeleton_Chain(smi = smi, scriptPath = scriptPath)
+  secosteroidSkeleton_derivative <- .searchSecosteroidSkeleton_Derivative(smi = smi, scriptPath = scriptPath)
+
   acyloxy_position <- .searchAcyloxy(smi = smi, scriptPath = scriptPath)
-  amide_position <- .searchAmide(smi = smi, scriptPath = scriptPath)
-  thioester_position <- .searchThioester(smi = smi, scriptPath = scriptPath)
   acyloxy_acylChain_position <- .searchAcyloxy_AcylChain(smi = smi, scriptPath = scriptPath)
-  names(acyloxy_acylChain_position) <- rep("acyloxy_acylChain", length(acyloxy_acylChain_position))
-  amide_acylChain_position <- .searchAmide_AcylChain(smi = smi, scriptPath = scriptPath)
-  names(amide_acylChain_position) <- rep("amide_acylChain", length(amide_acylChain_position))
-  thioester_acylChain_position <- .searchThioester_AcylChain(smi = smi, scriptPath = scriptPath)
-  names(thioester_acylChain_position) <- rep("thioester_acylChain", length(thioester_acylChain_position))
-  acyloxy_alkoxyChain_position <- .searchAcyloxy_AlkoxyChain(smi = smi, scriptPath = scriptPath)
-  names(acyloxy_alkoxyChain_position) <- rep("acyloxy_alkoxyChain", length(acyloxy_alkoxyChain_position))
-  amide_alkylaminoChain_position <- .searchAmide_AlkylaminoChain(smi = smi, scriptPath = scriptPath)
-  names(amide_alkylaminoChain_position) <- rep("amide_alkylaminoChain", length(amide_alkylaminoChain_position))
-  thioester_thioalkylChain_position <- .searchThioester_ThioalkylChain(smi = smi, scriptPath = scriptPath)
-  names(thioester_thioalkylChain_position) <- rep("thioester_thioalkylChain", length(thioester_thioalkylChain_position))
-  # 酰氧基链加上酰氧基键的位置
-  acyloxy_acylChain_position <- lapply(1:length(acyloxy_acylChain_position), function(i) {
-    unique(c(acyloxy_position[[i]], acyloxy_acylChain_position[[i]]))
-  })
-  # 酰胺基链加上酰胺基键的位置
-  amide_acylChain_position <- lapply(1:length(amide_acylChain_position), function(i) {
-    unique(c(amide_position[[i]], amide_acylChain_position[[i]]))
-  })
-  # 硫代酰碳链加上硫代酰键的位置
-  thioester_acylChain_position <- lapply(1:length(thioester_acylChain_position), function(i) {
-    unique(c(thioester_position[[i]], thioester_acylChain_position[[i]]))
-  })
-  # 酰氧基链加上酰氧基键的位置
-  acyloxy_alkoxyChain_position <- lapply(1:length(acyloxy_alkoxyChain_position), function(i) {
-    unique(c(acyloxy_position[[i]], acyloxy_alkoxyChain_position[[i]]))
-  })
-  # 酰胺基链加上酰胺基键的位置
-  amide_alkylaminoChain_position <- lapply(1:length(amide_alkylaminoChain_position), function(i) {
-    unique(c(amide_position[[i]], amide_alkylaminoChain_position[[i]]))
-  })
-  # 硫代酰碳链加上硫代酰键的位置
-  thioester_thioalkylChain_position <- lapply(1:length(thioester_thioalkylChain_position), function(i) {
-    unique(c(thioester_position[[i]], thioester_thioalkylChain_position[[i]]))
-  })
-  main_Chains <- c(acyloxy_acylChain_position, amide_acylChain_position, thioester_acylChain_position,
-                   acyloxy_alkoxyChain_position, amide_alkylaminoChain_position, thioester_thioalkylChain_position)
-  namesofmainChains <- c(rep("acyloxy_acylChain", length(acyloxy_acylChain_position)),
-                         rep("amide_acylChain", length(amide_acylChain_position)),
-                         rep("thioester_acylChain", length(thioester_acylChain_position)),
-                         rep("acyloxy_alkoxyChain", length(acyloxy_alkoxyChain_position)),
-                         rep("amide_alkylaminoChain", length(amide_alkylaminoChain_position)),
-                         rep("thioester_thioalkylChain", length(thioester_thioalkylChain_position)))
-  for(head in c("acyloxy_acylChain", "amide_acylChain", "thioester_acylChain")){
-    is <- which(namesofmainChains == head)
-    for(i in is){
-      x <- main_Chains[[i]]
-      if(all(x == "none")) next
-      for(j in (1:length(main_Chains))[-i]){
-        y <- main_Chains[[j]]
-        if(all(y[1:3] %in% x[-c(1:3)])) main_Chains[[j]] <- "none"
-      }
-    }
+  if(length(acyloxy_acylChain_position) != 0 & length(steroidSkeleton_chain1) != 0){
+    acyloxy_acylChain_position <- lapply(1:length(acyloxy_acylChain_position), function(i) {
+      unique(c(acyloxy_position[[i]], acyloxy_acylChain_position[[i]]))
+    })
+    l <- sapply(acyloxy_acylChain_position, function(x){
+      any(sapply(steroidSkeleton_chain1, function(y) {
+        if(all(x %in% y[-1])) return(TRUE)
+        else return(FALSE)
+      }))
+    })
+    acyloxy_acylChain_position <- acyloxy_acylChain_position[l]
+    steroidSkeleton_chain1 <- lapply(acyloxy_acylChain_position, function(x) {x[-c(2,3)]})
+  }else{
+    steroidSkeleton_chain1 <- list()
   }
-  main_Chains <- lapply(main_Chains, function(x) {
-    if(all(x == "none")) return(NULL)
-    else return(x[-c(2,3)])
-  })
-  names(main_Chains) <- namesofmainChains
-  main_Chains <- main_Chains[!sapply(main_Chains, is.null)]
-  browser()
+  names(steroidSkeleton_chain1) <- rep("steroidSkeleton_chain1", length(steroidSkeleton_chain1))
+  names(steroidSkeleton_chain2) <- rep("steroidSkeleton_chain2", length(steroidSkeleton_chain2))
+  names(steroidSkeleton_derivative) <- rep("steroidSkeleton_derivative", length(steroidSkeleton_derivative))
+  names(secosteroidSkeleton_chain) <- rep("secosteroidSkeleton_chain", length(secosteroidSkeleton_chain))
+  names(secosteroidSkeleton_derivative) <- rep("secosteroidSkeleton_derivative", length(secosteroidSkeleton_derivative))
+
+  main_chains <- c(steroidSkeleton_chain1, steroidSkeleton_chain2, steroidSkeleton_derivative,
+                   secosteroidSkeleton_chain, secosteroidSkeleton_derivative)
+  return(main_chains)
 }
+
 # .calCQS_FP_old <- function(smi, scriptPath){
 #   browser()
 #   acyloxy_position <- .searchAcyloxy(smi = smi, scriptPath = scriptPath)
