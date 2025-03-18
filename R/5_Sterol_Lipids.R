@@ -51,7 +51,7 @@
 # .searchSteroidSkeleton_Chain2(smi = "C1[C@]2(C)[C@@]3([H])CC[C@]4(C)[C@@]([H])([C@]([H])(C)CC/C(=C/CC)/C(C)C)CC[C@@]4([H])[C@]3([H])CC=C2C[C@@H](O)C1",
 #                              scriptPath = system.file("python", "molecule_operation.py", package = "LipRtPred"))
 .searchSteroidSkeleton_Chain2 <- function(smi, scriptPath){
-  steroidSkeleton_position <- .searchsteroidSkeleton(smi = smi, scriptPath = scriptPath)
+  steroidSkeleton_position <- .searchSteroidSkeleton(smi = smi, scriptPath = scriptPath)
   lapply(steroidSkeleton_position, function(x) {
     .TraverseMolecule(smi = smi,
                       start_atom_idx = x[9],
