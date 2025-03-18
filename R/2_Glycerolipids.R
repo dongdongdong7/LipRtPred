@@ -65,6 +65,10 @@
   ethers_position <- .GetSubstructMatches(smis = smi,
                                           SMARTS = "[CH2,CH3]-O-[C;!$(C=O)]",
                                           scriptPath = scriptPath)[[1]]
+  ethers_position <- lapply(ethers_position, function(x) {
+    if(all(x[c(1,2)] %in% unlist(glycerol_position))) return(x)
+    else return(rev(x))
+  })
   sn_info <- sapply(ethers_position, function(x) {
     if(x[2] %in% O_sn1) return("sn1")
     else if(x[2] %in% O_sn2) return("sn2")
@@ -80,15 +84,48 @@
 # (5) Search glycerol ether chain
 # .searchGlycerolEther_Chain(smi = "OC[C@]([H])(O)CO/C=C\\C#C/C=C\\CCCCCCC(C)C",
 #                            scriptPath = system.file("python", "molecule_operation.py", package = "LipRtPred"))
+# .searchGlycerolEther_Chain(smi = "OC[C@]1(OCC[C@H](C)CCC[C@H](C)CCC[C@H](C)CCC[C@@H](CC[C@@H](C)CCC[C@@H](C)CCC[C@@H](C)CCC[C@@H](C)CCO[C@@]([H])(CO)COCC[C@H](C)CCC[C@H](C)CCC[C@H](C)CCC[C@H](C)CC[C@@H](C)CCC[C@@H](C)CCC[C@@H](C)CCC[C@@H](C)CCOC1)C)[H]",
+#                            scriptPath = system.file("python", "molecule_operation.py", package = "LipRtPred"))
+# .searchGlycerolEther_Chain(smi = "OC[C@@](OCCCCCCCCC1CC2C3C4CCC4C3C2CC1)([H])COCCCCCCC1CC2C3C=CCCC3C2C=C1",
+#                            scriptPath = system.file("python", "molecule_operation.py", package = "LipRtPred"))
 .searchGlycerolEther_Chain <- function(smi, scriptPath){
   glycerolEther_position <- .searchGlycerolEther(smi = smi,
                                                  scriptPath = scriptPath)
-  lapply(glycerolEther_position, function(x) {
-    .TraverseMolecule(smi = smi,
-                      start_atom_idx = x[1],
-                      non_traversable_atom_idx = x[-1],
-                      scriptPath = scriptPath)
+  ringsInfo <- .GetRingAtom(smi = smi, scriptPath = scriptPath)
+  rings <- lapply(ringsInfo, function(ring) {
+    lapply(glycerolEther_position, function(x) {
+      if(all(x %in% ring)) return(x)
+      else return(NULL)
+    })
   })
+  rings <- lapply(rings, function(ring) {
+    purrr::compact(ring)
+  })
+  rings <- rings[!sapply(rings, function(ring) {length(ring) == 0})]
+  if(length(rings) == 0){
+    lapply(glycerolEther_position, function(x) {
+      .TraverseMolecule(smi = smi,
+                        start_atom_idx = x[3],
+                        non_traversable_atom_idx = x[-3],
+                        scriptPath = scriptPath)
+    })
+  }else{
+    lapply(glycerolEther_position, function(x) {
+      ring <- rings[[which(sapply(ringsInfo, function(y) {
+        if(all(x %in% y)) return(TRUE)
+        else return(FALSE)
+      }))]]
+      ring <- ring[!sapply(ring, function(y) {
+        if(all(x %in% y)) return(TRUE)
+        else return(FALSE)
+      })]
+      ring <- lapply(ring, function(y) {y[1:2]})
+      .TraverseMolecule(smi = smi,
+                        start_atom_idx = x[3],
+                        non_traversable_atom_idx = c(x[-3], unlist(ring)),
+                        scriptPath = scriptPath)
+    })
+  }
 }
 
 # 2. Dihydroxyacetone (DHA)
