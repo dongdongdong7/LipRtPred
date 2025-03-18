@@ -54,6 +54,14 @@ def GetAtomSymbol_py(smi, atom_idx_list):
     symbolList.append(atom.GetSymbol())
   return symbolList
 
+# Get atom index of rings
+def GetRingAtom_py(smi):
+  mol = Chem.MolFromSmiles(smi)
+  ring_info = mol.GetRingInfo()
+  rings = ring_info.AtomRings()
+  rings = tuple(sorted(rings, key = len))
+  return rings
+
 '''
 # Break all the rings in the molecule
 def BreakRings_py(smi):

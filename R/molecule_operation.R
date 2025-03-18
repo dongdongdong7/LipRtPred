@@ -63,6 +63,18 @@
   GetAtomSymbol_py(smi = smi, atom_idx_list = as.list(as.integer(atom_idx_vector)))
 }
 
+# Get atom index of rings
+# .GetRingAtom(smi = "OC[C@]1(OCC[C@H](C)CCC[C@H](C)CCC[C@H](C)CCC[C@@H](CC[C@@H](C)CCC[C@@H](C)CCC[C@@H](C)CCC[C@@H](C)CCO[C@@]([H])(CO)COCC[C@H](C)CCC[C@H](C)CCC[C@H](C)CCC[C@H](C)CC[C@@H](C)CCC[C@@H](C)CCC[C@@H](C)CCC[C@@H](C)CCOC1)C)[H]",
+#              scriptPath = system.file("python", "molecule_operation.py", package = "LipRtPred"))
+.GetRingAtom <- function(smi, scriptPath){
+  reticulate::source_python(scriptPath)
+  RingRes <- GetRingAtom_py(smi = smi)
+
+  lapply(RingRes, function(x) {
+    unlist(x)
+  })
+}
+
 # Traverse the entire molecule starting from the start atom, excluding the specified atoms
 # .TraverseMolecule(smi = "CC(CC)C(=O)O",
 #                   start_atom_idx = 4, non_traversable_atom_idx = c(5, 6),
