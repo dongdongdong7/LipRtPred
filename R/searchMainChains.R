@@ -98,12 +98,13 @@
         if(namesofmainChains[i] %in% c("acyloxy_acylChain", "amide_acylChain", "thioester_acylChain")){
           return(x[-c(2,3)])
         }else{
-          return(x[-c(1,2)])
+          return(x[-c(1,2,3)])
         }
       }
     })
     names(main_Chains) <- namesofmainChains
-    main_Chains <- main_Chains[!sapply(main_Chains, is.null)]
+    main_Chains <- main_Chains[sapply(main_Chains, function(x) {length(x) != 0})]
+    #main_Chains <- main_Chains[!sapply(main_Chains, is.null)]
     return(main_Chains)
   }
   else if(main_class == "Fatty Alcohol"){
@@ -135,6 +136,10 @@
 #                      scriptPath = system.file("python", "molecule_operation.py", package = "LipRtPred"))
 # .searchGL_MainChains(smi = "C(O[C@@H]1O[C@@H]([C@@H]([C@@H]([C@H]1O)O)O)CO)[C@]([H])(O)COC(C/C=C\\C/C=C\\C/C=C\\C/C=C\\C/C=C\\CC)=O",
 #                      scriptPath = system.file("python", "molecule_operation.py", package = "LipRtPred"))
+# .searchGL_MainChains(smi = "O[C@@H]1[C@@H](O)[C@@H](O)[C@@H](CO[C@@H]2[C@H](O)[C@@H](O)[C@@H](O)[C@@H](CO)O2)O[C@H]1OC[C@]([H])(O)COC(C/C=C\\C/C=C\\C/C=C\\C/C=C\\C/C=C\\CC)=O",
+#                      scriptPath = system.file("python", "molecule_operation.py", package = "LipRtPred"))
+# .searchGL_MainChains(smi = "[C@](CO[C@@H]1[C@H](O)[C@@H](O)[C@H](O)[C@@H](CS(O)(=O)=O)O1)([H])(O)COCCCCCCCCCCCCCCCC",
+#                      scriptPath = system.file("python", "molecule_operation.py", package = "LipRtPred"))
 .searchGL_MainChains <- function(smi, scriptPath){
   main_class <- .lipidClassification(smi = smi, scriptPath = scriptPath)
   if(main_class != "Glycerolipid"){
@@ -150,6 +155,18 @@
   glycerolEtherChain_position <- .searchGlycerolEther_Chain(smi = smi, scriptPath = scriptPath)
   dhaEsterChain_position <- .searchDihydroxyacetoneEster_Chain(smi = smi, scriptPath = scriptPath)
   dhaEtherChain_position <- .searchDihydroxyacetoneEther_Chain(smi = smi, scriptPath = scriptPath)
+  pentose_position <- .searchPentose(smi = smi, scriptPath = scriptPath)
+  hexose_position <- .searchHexose(smi = smi, scriptPath = scriptPath)
+  glycerolEtherChain_position <- lapply(glycerolEtherChain_position, function(x) {
+    if(x[1] %in% unlist(c(pentose_position, hexose_position))) return(NULL)
+    else return(x)
+  })
+  glycerolEtherChain_position <- glycerolEtherChain_position[!sapply(glycerolEtherChain_position, is.null)]
+  dhaEtherChain_position <- lapply(dhaEtherChain_position, function(x) {
+    if(x[1] %in% unlist(c(pentose_position, hexose_position))) return(NULL)
+    else return(x)
+  })
+  dhaEtherChain_position <- dhaEtherChain_position[!sapply(dhaEtherChain_position, is.null)]
   main_chains <- c(glycerolEsterChain_position, glycerolEtherChain_position, dhaEsterChain_position, dhaEtherChain_position)
   for(i in 1:length(main_chains)){
     x <- main_chains[[i]]
@@ -231,6 +248,11 @@
       return(NULL)
     }
   })
+  names(sphingosineC_chain_position) <- rep("sphingosineC_chain", length(sphingosineC_chain_position))
+  names(sphingosineN_chain_position) <- rep("sphingosineN_chain", length(sphingosineN_chain_position))
+  names(spisulosineC_chain_position) <- rep("spisulosineC_chain", length(spisulosineC_chain_position))
+  names(spisulosineN_chain_position) <- rep("spisulosineN_chain", length(spisulosineN_chain_position))
+  names(SP_other_chain_position) <- rep("SP_other_chain", length(SP_other_chain_position))
   main_chains <- c(sphingosineC_chain_position, sphingosineN_chain_position, spisulosineC_chain_position, spisulosineN_chain_position, SP_other_chain_position)
   return(main_chains)
 }
