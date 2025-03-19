@@ -20,15 +20,14 @@
 }
 
 # (2) Search Steroid skeleton derivative
-# .searchSteroidSkeleton_Derivative(smi = "C1C[C@H](O)C(C)(C)[C@]2([H])CCC3[C@]4(C)CC[C@]([H])([C@H](C)CCC(=C)C(C)C)[C@@]4(C)CCC=3[C@@]12C",
-#                                   scriptPath = system.file("python", "molecule_operation.py", package = "LipRtPred"))
+.searchSteroidSkeleton_Derivative(smi = "C1C[C@H](O)C(C)(C)[C@]2([H])CCC3[C@]4(C)CC[C@]([H])([C@H](C)CCC(=C)C(C)C)[C@@]4(C)CCC=3[C@@]12C",
+                                  scriptPath = system.file("python", "molecule_operation.py", package = "LipRtPred"))
 .searchSteroidSkeleton_Derivative <- function(smi, scriptPath){
   steroidSkeleton_position <- .searchSteroidSkeleton(smi = smi, scriptPath = scriptPath)
   lapply(steroidSkeleton_position, function(x) {
-    c(x[1],
-      .TraverseMolecule(smi = smi,
-                        start_atom_idx = x[2],
-                        non_traversable_atom_idx = c(x[1], x[9]),
+    c(.TraverseMolecule(smi = smi,
+                        start_atom_idx = x[1],
+                        non_traversable_atom_idx = x[9],
                         scriptPath = scriptPath),
       x[9])
   })
@@ -37,20 +36,20 @@
 # (3) Search steroid skeleton Chain 1
 # .searchSteroidSkeleton_Chain1(smi = "C1[C@H](OC(=O)CCCCCCCCCCC)CC2=CC[C@@]3([H])[C@]4([H])CC[C@]([H])([C@]([H])(C)CCCC(C)C)[C@@]4(C)CC[C@]3([H])[C@@]2(C)C1",
 #                               scriptPath = system.file("python", "molecule_operation.py", package = "LipRtPred"))
-.searchSteroidSkeleton_Chain1 <- function(smi, scriptPath){
-  steroidSkeleton_position <- .searchSteroidSkeleton(smi = smi, scriptPath = scriptPath)
-  lapply(steroidSkeleton_position, function(x) {
-    .TraverseMolecule(smi = smi,
-                      start_atom_idx = x[1],
-                      non_traversable_atom_idx = x[-1],
-                      scriptPath = scriptPath)
-  })
-}
+# .searchSteroidSkeleton_Chain1 <- function(smi, scriptPath){
+#   steroidSkeleton_position <- .searchSteroidSkeleton(smi = smi, scriptPath = scriptPath)
+#   lapply(steroidSkeleton_position, function(x) {
+#     .TraverseMolecule(smi = smi,
+#                       start_atom_idx = x[1],
+#                       non_traversable_atom_idx = x[-1],
+#                       scriptPath = scriptPath)
+#   })
+# }
 
-# (4) Search steroid skeleton Chain 2
-# .searchSteroidSkeleton_Chain2(smi = "C1[C@]2(C)[C@@]3([H])CC[C@]4(C)[C@@]([H])([C@]([H])(C)CC/C(=C/CC)/C(C)C)CC[C@@]4([H])[C@]3([H])CC=C2C[C@@H](O)C1",
+# (4) Search steroid skeleton Chain
+# .searchSteroidSkeleton_Chain(smi = "C1[C@]2(C)[C@@]3([H])CC[C@]4(C)[C@@]([H])([C@]([H])(C)CC/C(=C/CC)/C(C)C)CC[C@@]4([H])[C@]3([H])CC=C2C[C@@H](O)C1",
 #                              scriptPath = system.file("python", "molecule_operation.py", package = "LipRtPred"))
-.searchSteroidSkeleton_Chain2 <- function(smi, scriptPath){
+.searchSteroidSkeleton_Chain <- function(smi, scriptPath){
   steroidSkeleton_position <- .searchSteroidSkeleton(smi = smi, scriptPath = scriptPath)
   lapply(steroidSkeleton_position, function(x) {
     .TraverseMolecule(smi = smi,
