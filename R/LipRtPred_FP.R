@@ -8,26 +8,8 @@
 # scriptPath: path of molecule_operation.py
 # minimumohNum: minimum number of OH to be taken into account when calculating the OH distance
 
-# .calLipRtPred_FP(smi = "C(CC(C)CCCCCCCCCC(=O)O)(=O)O",
-#                  scriptPath = system.file("python", "molecule_operation.py", package = "LipRtPred"))
-# .calLipRtPred_FP(smi = "O=C(CCCCC)OCC(C)CC",
-#                  scriptPath = system.file("python", "molecule_operation.py", package = "LipRtPred"))
-# .calLipRtPred_FP(smi = "[C@](CO[C@@H]1[C@H](O)[C@@H](O)[C@H](O)[C@@H](CS(O)(=O)=O)O1)([H])(O)COCCCCCCCCCCCCCCCC",
-#                  scriptPath = system.file("python", "molecule_operation.py", package = "LipRtPred"))
-# .calLipRtPred_FP(smi = "[C@](COP(=O)(O)OCCN)([H])(OC(CCC/C=C\\C/C=C\\C=C\\[C@@H](O)C/C=C\\CCCCC)=O)CO/C=C\\CCCCCCCCCCCCCC",
-#                  scriptPath = system.file("python", "molecule_operation.py", package = "LipRtPred"))
-# .calLipRtPred_FP(smi = "C(OC(=O)CCCCCCCCCCCCCCC)[C@]([H])(NC(CCCCCCCCCCCCCCC)=O)[C@H](O)/C=C/CCCCCCCCCCCCC",
-#                  scriptPath = system.file("python", "molecule_operation.py", package = "LipRtPred"))
-.calLipRtPred_FP(smi = "C(OC(=O)CCCCCCCCCCCCCCC)[C@]([H])(NC(CCCCCCCCCCCCCCC)=O)[C@H](O)/C=C/CCCCCCCCCCCCC",
+.calLipRtPred_FP(smi = "OC[C@]([H])(NC(=O)CCCCCCCCCCCCCCC)C(=O)CCCCCCCCCCCCCCC",
                  scriptPath = system.file("python", "molecule_operation.py", package = "LipRtPred"))
-# .calLipRtPred_FP(smi = "C1C[C@H](O)[C@@H](C)[C@]2([H])CC=C3[C@]4([H])CC[C@]([H])([C@H](C)CC[C@H](CC)C(C)C)[C@@]4(C)CC[C@]3([H])[C@@]12C",
-#                  scriptPath = system.file("python", "molecule_operation.py", package = "LipRtPred"))
-# .calLipRtPred_FP(smi = "[C@]12(CC=C3C[C@@H](OC(CCCCC/C=C\\CCCCCCCCC)=O)CC[C@]3(C)[C@@]1([H])CC[C@]1(C)[C@@]([H])([C@@](C)([H])CCCC(C)C)CC[C@@]21[H])[H]",
-#                  scriptPath = system.file("python", "molecule_operation.py", package = "LipRtPred"))
-# .calLipRtPred_FP(smi = "C(CCCCCCC(=O)O)/C=C\\C=C\\[C@H]1OO[C@@H]([C@H](O)CC)C1",
-#                  scriptPath = system.file("python", "molecule_operation.py", package = "LipRtPred"))
-# .calLipRtPred_FP(smi = "C(C/C=C\\C/C=C\\C/C=C\\C/C=C\\C/C=C\\CCCCC)CCC(=O)SCCNC(=O)CCNC([C@H](O)C(C)(C)COP(O)(=O)OP(O)(=O)OC[C@@H]1[C@@H](OP(=O)(O)O)[C@@H](O)[C@@H](O1)N1C=NC2C(N)=NC=NC1=2)=O",
-#                  scriptPath = system.file("python", "molecule_operation.py", package = "LipRtPred"))
 .calLipRtPred_FP <- function(smi, scriptPath, minimumohNum = 6){
   # Main Chains
   FA_MainChains <- .searchFA_MainChains(smi = smi, scriptPath = scriptPath)
@@ -61,10 +43,20 @@
                                       scriptPath = scriptPath)[[1]]
   if(length(oh_position) != 0){
     ohNum <- length(which(sapply(oh_position, function(x) {
-      if(all(x %in% unlist(c(main_C_chains)))) return(TRUE)
+      if(all(x %in% unlist(main_C_chains))) return(TRUE)
       else return(FALSE)
     })))
   }else ohNum <- 0
+  # 酮
+  dbo_position <- .GetSubstructMatches(smis = smi,
+                                       SMARTS = "[C;$(C=O);!$(C-[N,O,S,P])]=[OX1]",
+                                       scriptPath = scriptPath)[[1]]
+  if(length(dbo_position) != 0){
+    dboNum <- length(which(sapply(dbo_position, function(x) {
+      if(all(x %in% unlist(main_C_chains))) return(TRUE)
+      else return(FALSE)
+    })))
+  }else dboNum <- 0
   # 酰氧键
   coo_position <- .searchAcyloxy(smi = smi, scriptPath = scriptPath)
   if(length(coo_position) != 0){
@@ -146,6 +138,16 @@
       sphdbNum <- length(sphdb_position)
     }else {
       sphdbNum <- 0
+    }
+    # 酮
+    if(length(dbo_position) != 0){
+      sphdbo_position <- dbo_position[sapply(dbo_position, function(x) {
+        if(all(x %in% sphingosineC_chain)) return(TRUE)
+        else return(FALSE)
+      })]
+      sphdboNum <- length(sphdbo_position)
+    }else{
+      sphdboNum <- 0
     }
   }
   browser()
