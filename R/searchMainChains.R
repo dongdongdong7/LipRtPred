@@ -269,36 +269,33 @@
 .searchST_MainChains <- function(smi, scriptPath){
   main_class <- .lipidClassification(smi = smi, scriptPath = scriptPath)
   if(main_class != "Sterol") return(list())
-  steroidSkeleton_chain1 <- .searchSteroidSkeleton_Chain1(smi = smi, scriptPath = scriptPath)
-  steroidSkeleton_chain2 <- .searchSteroidSkeleton_Chain2(smi = smi, scriptPath = scriptPath)
+  steroidSkeleton_position <- .searchSteroidSkeleton(smi = smi, scriptPath = scriptPath)
+  steroidSkeleton_chain <- .searchSteroidSkeleton_Chain(smi = smi, scriptPath = scriptPath)
   steroidSkeleton_derivative <- .searchSteroidSkeleton_Derivative(smi = smi, scriptPath = scriptPath)
   secosteroidSkeleton_chain <- .searchSecosteroidSkeleton_Chain(smi = smi, scriptPath = scriptPath)
   secosteroidSkeleton_derivative <- .searchSecosteroidSkeleton_Derivative(smi = smi, scriptPath = scriptPath)
-
+  sterylEsterChain_position <- .searchSterylEster_Chain(smi = smi, scriptPath = scriptPath)
   acyloxy_position <- .searchAcyloxy(smi = smi, scriptPath = scriptPath)
-  acyloxy_acylChain_position <- .searchAcyloxy_AcylChain(smi = smi, scriptPath = scriptPath)
-  if(length(acyloxy_acylChain_position) != 0 & length(steroidSkeleton_chain1) != 0){
-    acyloxy_acylChain_position <- lapply(1:length(acyloxy_acylChain_position), function(i) {
-      unique(c(acyloxy_position[[i]], acyloxy_acylChain_position[[i]]))
+  if(length(sterylEsterChain_position) != 0){
+    sterylEsterChain_position_new <- lapply(sterylEsterChain_position, function(x) {
+      l <- sapply(acyloxy_position, function(y) {
+        y[1] %in% x
+      })
+      acy <- acyloxy_position[[which(l)]]
+      unique(c(acy, x))
     })
-    l <- sapply(acyloxy_acylChain_position, function(x){
-      any(sapply(steroidSkeleton_chain1, function(y) {
-        if(all(x %in% y[-1])) return(TRUE)
-        else return(FALSE)
-      }))
+    steroidSkeleton_derivative <- lapply(steroidSkeleton_derivative, function(x) {
+      x[!x %in% unlist(sterylEsterChain_position_new)]
     })
-    acyloxy_acylChain_position <- acyloxy_acylChain_position[l]
-    steroidSkeleton_chain1 <- lapply(acyloxy_acylChain_position, function(x) {x[-c(2,3)]})
-  }else{
-    steroidSkeleton_chain1 <- list()
   }
-  names(steroidSkeleton_chain1) <- rep("steroidSkeleton_chain1", length(steroidSkeleton_chain1))
-  names(steroidSkeleton_chain2) <- rep("steroidSkeleton_chain2", length(steroidSkeleton_chain2))
+
+  names(steroidSkeleton_chain) <- rep("steroidSkeleton_chain", length(steroidSkeleton_chain))
+  names(sterylEsterChain_position) <- rep("sterylEster_chain", length(sterylEsterChain_position))
   names(steroidSkeleton_derivative) <- rep("steroidSkeleton_derivative", length(steroidSkeleton_derivative))
   names(secosteroidSkeleton_chain) <- rep("secosteroidSkeleton_chain", length(secosteroidSkeleton_chain))
   names(secosteroidSkeleton_derivative) <- rep("secosteroidSkeleton_derivative", length(secosteroidSkeleton_derivative))
 
-  main_chains <- c(steroidSkeleton_chain1, steroidSkeleton_chain2, steroidSkeleton_derivative,
+  main_chains <- c(steroidSkeleton_chain, sterylEsterChain_position, steroidSkeleton_derivative,
                    secosteroidSkeleton_chain, secosteroidSkeleton_derivative)
   return(main_chains)
 }
