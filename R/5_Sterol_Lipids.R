@@ -27,9 +27,9 @@
   lapply(steroidSkeleton_position, function(x) {
     c(.TraverseMolecule(smi = smi,
                         start_atom_idx = x[1],
-                        non_traversable_atom_idx = x[9],
+                        non_traversable_atom_idx = x[c(9, 10)],
                         scriptPath = scriptPath),
-      x[9])
+      x[c(9, 10)])
   })
 }
 
