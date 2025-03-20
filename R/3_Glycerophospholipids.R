@@ -25,9 +25,11 @@
 # (1) Search phosphate group
 # .searchPhosphate(smi = "C(O[C@H]1[C@H](O)[C@@H](O)[C@H](O)[C@@H](COP(=O)(O)OCCN)O1)[C@]([H])(OC(CCCCCCC/C=C\\CCCCCC)=O)CO/C=C\\CCCCCCCCCCCCCC",
 #                  scriptPath = system.file("python", "molecule_operation.py", package = "LipRtPred"))
+# .searchPhosphate(smi = "C(CN)P(OC[C@]([H])(NC(=O)CCCCCCCCCCCCC)[C@]([H])(O)/C=C/CCCCCCCCCCCCC)(=O)O",
+#                  scriptPath = system.file("python", "molecule_operation.py", package = "LipRtPred"))
 .searchPhosphate <- function(smi, scriptPath){
   .GetSubstructMatches(smis = smi,
-                       SMARTS = "P(=O)(O)(O)O",
+                       SMARTS = "P(=O)(O)(O)-*",
                        scriptPath = scriptPath)[[1]]
 }
 
