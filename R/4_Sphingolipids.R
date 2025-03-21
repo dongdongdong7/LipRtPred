@@ -41,6 +41,7 @@
     if(x[3] %in% unlist(sphingosine_position)) return(TRUE)
     else return(FALSE)
   })
+  if(length(sphingosieAmide_logical) == 0) return(list())
   sphingosieAmide_position <- sphingosieAmide_position[sphingosieAmide_logical]
   lapply(sphingosieAmide_position, function(x) {
     .TraverseMolecule(smi = smi,
@@ -81,6 +82,7 @@
     if(x[3] %in% unlist(spisulosine_position)) return(TRUE)
     else return(FALSE)
   })
+  if(length(spisulosineAmide_logical) == 0) return(list())
   spisulosineAmide_position <- spisulosineAmide_position[spisulosineAmide_logical]
   lapply(spisulosineAmide_position, function(x) {
     .TraverseMolecule(smi = smi,
