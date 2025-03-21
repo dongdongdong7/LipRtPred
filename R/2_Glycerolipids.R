@@ -151,6 +151,7 @@
     else return(FALSE)
   })
   dihydroxyacetoneEster_position <- acyloxy_position[dihydroxyacetoneEster_logical]
+  names(dihydroxyacetoneEster_position) <- rep("sn1", length(dihydroxyacetoneEster_position))
   return(dihydroxyacetoneEster_position)
 }
 
@@ -182,6 +183,7 @@
     else return(FALSE)
   })
   dihydroxyacetoneEther_position <- dihydroxyacetoneEther_position[dihydroxyacetoneEther_logical]
+  names(dihydroxyacetoneEther_position) <- rep("sn1", length(dihydroxyacetoneEther_position))
   return(dihydroxyacetoneEther_position)
 }
 
