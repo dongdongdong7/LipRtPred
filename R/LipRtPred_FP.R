@@ -8,7 +8,7 @@
 # scriptPath: path of molecule_operation.py
 # minimumohNum: minimum number of OH to be taken into account when calculating the OH distance
 
-.calLipRtPred_FP(smi = "C1C[C@H](O)C(C)(C)[C@]2([H])CCC3[C@]4(C)CC[C@]([H])([C@H](C)CCC(=C)C(C)C)[C@@]4(C)CCC=3[C@@]12C",
+.calLipRtPred_FP(smi = "C(OC(=O)CCCCCCCCC(O)CC(O)CCCCCC)[C@]([H])(OC(CCCCCCCCCC(O)CCCCC)=O)COC(CCCCCC(O)CCCCC)=O",
                  scriptPath = system.file("python", "molecule_operation.py", package = "LipRtPred"))
 .calLipRtPred_FP <- function(smi, scriptPath, minimumohNum = 6){
   # Main Chains
@@ -25,6 +25,44 @@
   steroidSkeleton_derivative <- as.integer(unlist(ST_MainChains[names(ST_MainChains) == "steroidSkeleton_derivative"]))
   secosteroidSkeleton_chain <- as.integer(unlist(ST_MainChains[names(ST_MainChains) == "secosteroidSkeleton_chain"]))
   secosteroidSkeleton_derivative <- as.integer(unlist(ST_MainChains[names(ST_MainChains) == "secosteroidSkeleton_derivative"]))
+
+  # 特征基团 TODO
+  # 甘油
+  glycerolNum <- length(.searchGlycerol(smi = smi, scriptPath = scriptPath))
+  # 二羟基丙酮
+  oh2dboNum <- length(.searchDihydroxyacetone(smi = smi, scriptPath = scriptPath))
+  # 磷酸
+  phosphateNum <- length(.searchPhosphate(smi = smi, scriptPath = scriptPath))
+  # 甜菜碱
+  betaineNum <- length(.searchBetaine(smi = smi, scriptPath = scriptPath))
+  # 五碳糖
+  pentose_position <- .searchPentose(smi = smi, scriptPath = scriptPath)
+  pentoseNum <- length(pentose_position)
+  # 六碳糖
+  hexose_position <- .searchHexose(smi = smi, scriptPath = scriptPath)
+  hexoseNum <- length(hexose_position)
+  carbohydrate_position <- unlist(c(pentose_position, hexose_position))
+  main_C_chains <- lapply(main_C_chains, function(x) {
+    x[!x %in% carbohydrate_position]
+  })
+  carbohydrateNum <- sum(c(pentoseNum, hexoseNum))
+  # 胆碱
+  cholineNum <- length(.searchCholine(smi = smi, scriptPath = scriptPath))
+  # 乙醇胺
+  ethanolamineNum <- length(.searchEthanolamine(smi = smi, scriptPath = scriptPath))
+  # 丝氨酸
+  serineNum <- length(.searchSerine(smi = smi, scriptPath = scriptPath))
+  # 肌醇
+  cholineNum <- length(.searchCholine(smi = smi, scriptPath = scriptPath))
+  # 乙醇
+  ethanolNum <- length(.searchEthanol(smi = smi, scriptPath = scriptPath))
+  # 苏氨酸
+  threonineNum <- length(.searchThreonine(smi = smi, scriptPath = scriptPath))
+  # 肉碱
+  carnitineNum <- length(.searchCarnitine(smi = smi, scriptPath = scriptPath))
+  # 磺酰基
+  sulfonylNum <- length(.searchSulfonyl(smi = smi, scriptPath = scriptPath))
+
 
   # 一般基团
   # 双键
@@ -46,7 +84,26 @@
       if(all(x %in% unlist(main_C_chains))) return(TRUE)
       else return(FALSE)
     })))
-  }else ohNum <- 0
+    if(length(main_C_chains) != 0){
+      ohPos <- sapply(oh_position, function(x) {
+        nmc <- main_C_chains[[which(sapply(main_C_chains, function(y) {
+          if(all(x %in% y)) return(TRUE)
+          else return(FALSE)
+        }))]]
+        length(.GetShortestPath(smi = smi, start_atom_idx = x[2], end_atom_idx = nmc[1], scriptPath = scriptPath))
+      })
+      ohPos <- sort(ohPos)
+      ohPos <- ohPos[1:minimumohNum]
+      ohPos[is.na(ohPos)] <- 0
+    }else{
+      ohPos <- rep(0, 1:minimumohNum)
+    }
+    names(ohPos) <- paste0("ohPos", 1:length(ohPos))
+  }else{
+    ohNum <- 0
+    ohPos <- rep(0, 1:minimumohNum)
+    names(ohPos) <- paste0("ohPos", 1:length(ohPos))
+  }
   # 酮
   dbo_position <- .GetSubstructMatches(smis = smi,
                                        SMARTS = "[C;$(C=O);!$(C-[N,O,S,P])]=[OX1]",
@@ -68,38 +125,38 @@
   # 酰胺键
   con_position <- .searchAmide(smi = smi, scriptPath = scriptPath)
   if(length(con_position) != 0){
-    conNum <- which(sapply(con_position, function(x) {
+    conNum <- length(which(sapply(con_position, function(x) {
       if(all(x %in% unlist(main_C_chains))) return(TRUE)
       else return(FALSE)
-    }))
+    })))
   }else conNum <- 0
   # 硫代酰
   cos_position <- .searchThioester(smi = smi, scriptPath = scriptPath)
   if(length(cos_position) != 0){
-    cosNum <- which(sapply(cos_position, function(x) {
+    cosNum <- length(which(sapply(cos_position, function(x) {
       if(all(x %in% unlist(main_C_chains))) return(TRUE)
       else return(FALSE)
-    }))
+    })))
   }else cosNum <- 0
   # 醚键
   coc_position <- .GetSubstructMatches(smis = smi,
                                        SMARTS = "[C;!$(C=O);$(C-O)]-[OX2;OH0]-[C;!$(C=O);$(C-O)]",
                                        scriptPath = scriptPath)[[1]]
   if(length(coc_position) != 0){
-    cocNum <- which(sapply(coc_position, function(x) {
+    cocNum <- length(which(sapply(coc_position, function(x) {
       if(all(x %in% unlist(main_C_chains))) return(TRUE)
       else return(FALSE)
-    }))
+    })))
   }else cocNum <- 0
   # 过氧化键
   oo_position <- .GetSubstructMatches(smis = smi,
                                       SMARTS = "[O]-[O]",
                                       scriptPath = scriptPath)[[1]]
   if(length(oo_position) != 0){
-    ooNum <- which(sapply(oo_position, function(x) {
+    ooNum <- length(which(sapply(oo_position, function(x) {
       if(all(x %in% unlist(main_C_chains))) return(TRUE)
       else return(FALSE)
-    }))
+    })))
   }else ooNum <- 0
 
   # 鞘氨醇骨架及其变体
@@ -249,7 +306,7 @@
     }
   }
 
-  # 类固醇碳链
+  # 类固醇骨架碳链
   if(length(steroidSkeleton_chain) != 0){
     symbols <- .GetAtomSymbol(smi = smi, atom_idx_vector = steroidSkeleton_chain, scriptPath = scriptPath)
     steroidSkCC <- length(which(symbols == "C"))
@@ -298,11 +355,110 @@
     }
   }
 
+  # 断链甾醇骨架及其变体
+  if(length(secosteroidSkeleton_derivative) != 0){
+    symbols <- .GetAtomSymbol(smi = smi, atom_idx_vector = secosteroidSkeleton_derivative, scriptPath = scriptPath)
+    secosteroidSkDC <- length(symbols == "C")
+    # 羟基与位置
+    if(length(oh_position)){
+      secosteroidSkDoh_position <- oh_position[sapply(oh_position, function(x) {
+        if(all(x %in% secosteroidSkeleton_derivative)) return(TRUE)
+        else return(FALSE)
+      })]
+      secosteroidSkDohNum <- length(secosteroidSkDoh_position)
+      if(secosteroidSkDohNum != 0){
+        secosteroidSkDohPos <- sapply(secosteroidSkDoh_position, function(x) {
+          length(.GetShortestPath(smi = smi, start_atom_idx = x[2], end_atom_idx = secosteroidSkeleton_derivative[1], scriptPath = scriptPath))
+        })
+        secosteroidSkDohPos <- secosteroidSkDohPos[1:minimumohNum]
+        names(secosteroidSkDohPos) <- paste0("secosteroidSkDohPos", 1:length(secosteroidSkDohPos))
+        secosteroidSkDohPos[is.na(secosteroidSkDohPos)] <- 0
+      }else{
+        secosteroidSkDohPos <- rep(0, minimumohNum)
+        names(secosteroidSkDohPos) <- paste0("secosteroidSkDohPos", 1:length(secosteroidSkDohPos))
+      }
+    }else{
+      secosteroidSkDohNum <- 0
+      secosteroidSkDohPos <- rep(0, minimumohNum)
+      names(secosteroidSkDohPos) <- paste0("secosteroidSkDohPos", 1:length(secosteroidSkDohPos))
+    }
+    # 双键
+    if(length(db_position) != 0){
+      secosteroidSkDdb_position <- db_position[sapply(db_position, function(x) {
+        if(all(x %in% secosteroidSkeleton_derivative)) return(TRUE)
+        else return(FALSE)
+      })]
+      secsteroidSkDdbNum <- length(secosteroidSkDdb_position)
+    }else{
+      secsteroidSkDdbNum <- 0
+    }
+    # 酮
+    if(length(dbo_position) != 0){
+      secsteroidSkDdbo_position <- dbo_position[sapply(dbo_position, function(x) {
+        if(all(x %in% secosteroidSkeleton_derivative)) return(TRUE)
+        else return(FALSE)
+      })]
+      secsteroidSkDdboNum <- length(secsteroidSkDdbo_position)
+    }else{
+      secsteroidSkDdboNum <- 0
+    }
+  }
+
+  # 断链甾醇骨架碳链
+  if(length(secosteroidSkeleton_chain) != 0){
+    symbols <- .GetAtomSymbol(smi = smi, atom_idx_vector = secosteroidSkeleton_chain, scriptPath = scriptPath)
+    secosteroidSkCC <- length(symbols == "C")
+    # 羟基与位置
+    if(length(oh_position)){
+      secosteroidSkCoh_position <- oh_position[sapply(oh_position, function(x) {
+        if(all(x %in% secosteroidSkeleton_chain)) return(TRUE)
+        else return(FALSE)
+      })]
+      secosteroidSkCohNum <- length(secosteroidSkCoh_position)
+      if(secosteroidSkCohNum != 0){
+        secosteroidSkCohPos <- sapply(secosteroidSkCoh_position, function(x) {
+          length(.GetShortestPath(smi = smi, start_atom_idx = x[2], end_atom_idx = secosteroidSkeleton_chain[1], scriptPath = scriptPath))
+        })
+        secosteroidSkCohPos <- secosteroidSkCohPos[1:minimumohNum]
+        names(secosteroidSkCohPos) <- paste0("secosteroidSkCohPos", 1:length(secosteroidSkCohPos))
+        secosteroidSkCohPos[is.na(secosteroidSkCohPos)] <- 0
+      }else{
+        secosteroidSkCohPos <- rep(0, minimumohNum)
+        names(secosteroidSkCohPos) <- paste0("secosteroidSkCohPos", 1:length(secosteroidSkCohPos))
+      }
+    }else{
+      secosteroidSkDohNum <- 0
+      secosteroidSkCohPos <- rep(0, minimumohNum)
+      names(secosteroidSkCohPos) <- paste0("secosteroidSkCohPos", 1:length(secosteroidSkCohPos))
+    }
+    # 双键
+    if(length(db_position) != 0){
+      secosteroidSkCdb_position <- db_position[sapply(db_position, function(x) {
+        if(all(x %in% secosteroidSkeleton_chain)) return(TRUE)
+        else return(FALSE)
+      })]
+      secsteroidSkCdbNum <- length(secosteroidSkCdb_position)
+    }else{
+      secsteroidSkCdbNum <- 0
+    }
+    # 酮
+    if(length(dbo_position) != 0){
+      secsteroidSkCdbo_position <- dbo_position[sapply(dbo_position, function(x) {
+        if(all(x %in% secosteroidSkeleton_chain)) return(TRUE)
+        else return(FALSE)
+      })]
+      secsteroidSkCdboNum <- length(secsteroidSkCdbo_position)
+    }else{
+      secsteroidSkCdboNum <- 0
+    }
+  }
+
+
+  mainChainCNum <- sum(sapply(main_C_chains, function(x) {
+    length(which(.GetAtomSymbol(smi = smi, atom_idx_vector = x, scriptPath = scriptPath) == "C"))
+  }))
+  names(mainChainCNum) <- "C"
 
   browser()
-
-  FA_c <- sum(sapply(FA_MainChains, function(x) {
-    x_symbol <- .GetAtomSymbol(smi = smi, atom_idx_vector = x, scriptPath = scriptPath)
-    length(which(x_symbol == "C"))
-  }))
+  LipRtPredFP <- c(mainChainCNum)
 }
