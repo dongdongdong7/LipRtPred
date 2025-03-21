@@ -160,6 +160,11 @@
   }else ooNum <- 0
 
   # 鞘氨醇骨架及其变体
+  sphC <- 0
+  sphohNum <- 0
+  sphohPos <- rep(0, minimumohNum)
+  sphdbNum <- 0
+  sphdboNum <- 0
   if(length(sphingosineC_chain) != 0){
     symbols <- .GetAtomSymbol(smi = smi, atom_idx_vector = sphingosineC_chain, scriptPath = scriptPath)
     sphC <- length(which(symbols == "C"))
@@ -174,17 +179,10 @@
         sphohPos <- sapply(sphoh_position, function(x) {
           length(.GetShortestPath(smi = smi, start_atom_idx = x[2], end_atom_idx = sphingosineC_chain[1], scriptPath = scriptPath))
         })
+        sphohPos <- sort(sphohPos)
         sphohPos <- sphohPos[1:minimumohNum]
-        names(sphohPos) <- paste0("sphohPos", 1:length(sphohPos))
         sphohPos[is.na(sphohPos)] <- 0
-      }else{
-        sphohPos <- rep(0, minimumohNum)
-        names(sphohPos) <- paste0("sphohPos", 1:length(sphohPos))
       }
-    }else{
-      sphohNum <- 0
-      sphohPos <- rep(0, minimumohNum)
-      names(sphohPos) <- paste0("sphohPos", 1:length(sphohPos))
     }
     # 双键
     if(length(db_position) != 0){
@@ -193,8 +191,6 @@
         else return(FALSE)
       })]
       sphdbNum <- length(sphdb_position)
-    }else {
-      sphdbNum <- 0
     }
     # 酮
     if(length(dbo_position) != 0){
@@ -203,12 +199,20 @@
         else return(FALSE)
       })]
       sphdboNum <- length(sphdbo_position)
-    }else{
-      sphdboNum <- 0
     }
   }
+  names(sphC) <- "sphC"
+  names(sphohNum) <- "sphohNum"
+  names(sphohPos) <- paste0("sphohPos", 1:length(sphohPos))
+  names(sphdbNum) <- "sphdbNum"
+  names(sphdboNum) <- "sphdboNum"
 
   # 水苏碱骨架及其变体
+  spiC <- 0
+  spiohNum <- 0
+  spiohPos <- rep(0, minimumohNum)
+  spidbNum <- 0
+  spidboNum <- 0
   if(length(spisulosineC_chain) != 0){
     symbols <- .GetAtomSymbol(smi = smi, atom_idx_vector = spisulosineC_chain, scriptPath = scriptPath)
     spiC <- length(which(symbols == "C"))
@@ -223,17 +227,10 @@
         spiohPos <- sapply(spioh_position, function(x) {
           length(.GetShortestPath(smi = smi, start_atom_idx = x[2], end_atom_idx = spisulosineC_chain[1], scriptPath = scriptPath))
         })
+        spiohPos <- sort(spiohPos)
         spiohPos <- spiohPos[1:minimumohNum]
-        names(spiohPos) <- paste0("spiohPos", 1:length(spiohPos))
         spiohPos[is.na(spiohPos)] <- 0
-      }else{
-        spiohPos <- rep(0, minimumohNum)
-        names(spiohPos) <- paste0("spiohPos", 1:length(spiohPos))
       }
-    }else{
-      spiohNum <- 0
-      spiohPos <- rep(0, minimumohNum)
-      names(spiohPos) <- paste0("spiohPos", 1:length(spiohPos))
     }
     # 双键
     if(length(db_position) != 0){
@@ -242,8 +239,6 @@
         else return(FALSE)
       })]
       spidbNum <- length(spidb_position)
-    }else{
-      spidbNum <- 0
     }
     # 酮
     if(length(dbo_position) != 0){
@@ -252,12 +247,20 @@
         else return(FALSE)
       })]
       spidboNum <- length(spidbo_position)
-    }else{
-      spidboNum <- 0
     }
   }
+  names(spiC) <- "spiC"
+  names(spiohNum) <- "spiohNum"
+  names(spiohPos) <- paste0("spiohPos", 1:length(spiohPos))
+  names(spidbNum) <- "spidbNum"
+  names(spidboNum) <- "spidboNum"
 
   # 类固醇骨架变体
+  steroidSkDC <- 0
+  steroidSkDohNum <- 0
+  steroidSkDohPos <- rep(0, minimumohNum)
+  steroidSkDdbNum <- 0
+  steroidSkDdboNum <- 0
   if(length(steroidSkeleton_derivative) != 0){
     symbols <- .GetAtomSymbol(smi = smi, atom_idx_vector = steroidSkeleton_derivative, scriptPath = scriptPath)
     steroidSkDC <- length(symbols == "C")
@@ -272,17 +275,10 @@
         steroidSkDohPos <- sapply(steroidSkDoh_position, function(x) {
           length(.GetShortestPath(smi = smi, start_atom_idx = x[2], end_atom_idx = steroidSkeleton_derivative[1], scriptPath = scriptPath))
         })
+        steroidSkDohPos <- sort(steroidSkDohPos)
         steroidSkDohPos <- steroidSkDohPos[1:minimumohNum]
-        names(steroidSkDohPos) <- paste0("steroidSkDohPos", 1:length(steroidSkDohPos))
         steroidSkDohPos[is.na(steroidSkDohPos)] <- 0
-      }else{
-        steroidSkDohPos <- rep(0, minimumohNum)
-        names(steroidSkDohPos) <- paste0("steroidSkDohPos", 1:length(steroidSkDohPos))
       }
-    }else{
-      steroidSkDohNum <- 0
-      steroidSkDohPos <- rep(0, minimumohNum)
-      names(steroidSkDohPos) <- paste0("steroidSkDohPos", 1:length(steroidSkDohPos))
     }
     # 双键
     if(length(db_position) != 0){
@@ -291,8 +287,6 @@
         else return(FALSE)
       })]
       steroidSkDdbNum <- length(steroidSkDdb_position)
-    }else{
-      steroidSkDdbNum <- 0
     }
     # 酮
     if(length(dbo_position) != 0){
@@ -301,12 +295,20 @@
         else return(FALSE)
       })]
       steroidSkDdboNum <- length(steroidSkDdbo_position)
-    }else{
-      steroidSkDdboNum <- 0
     }
   }
+  names(steroidSkDC) <- "steroidSkDC"
+  names(steroidSkDohNum) <- "steroidSkDohNum"
+  names(steroidSkDohPos) <- paste0("steroidSkDohPos", 1:length(steroidSkDohPos))
+  names(steroidSkDdbNum) <- "steroidSkDdbNum"
+  names(steroidSkDdboNum) <- "steroidSkDdboNum"
 
   # 类固醇骨架碳链
+  steroidSkCC <- 0
+  steroidSkCohNum <- 0
+  steroidSkCohPos <- rep(0, minimumohNum)
+  steroidSkCdbNum <- 0
+  steroidSkCdboNum <- 0
   if(length(steroidSkeleton_chain) != 0){
     symbols <- .GetAtomSymbol(smi = smi, atom_idx_vector = steroidSkeleton_chain, scriptPath = scriptPath)
     steroidSkCC <- length(which(symbols == "C"))
@@ -321,17 +323,10 @@
         steroidSkCohPos <- sapply(steroidSkCoh_position, function(x) {
           length(.GetShortestPath(smi = smi, start_atom_idx = x[2], end_atom_idx = steroidSkeleton_chain[1], scriptPath = scriptPath))
         })
+        steroidSkCohPos <- sort(steroidSkCohPos)
         steroidSkCohPos <- steroidSkCohPos[1:minimumohNum]
-        names(steroidSkCohPos) <- paste0("steroidSkCohPos", 1:length(steroidSkCohPos))
         steroidSkCohPos[is.na(steroidSkCohPos)] <- 0
-      }else{
-        steroidSkCohPos <- rep(0, minimumohNum)
-        names(steroidSkCohPos) <- paste0("steroidSkCohPos", 1:length(steroidSkCohPos))
       }
-    }else{
-      steroidSkCohNum <- 0
-      steroidSkCohPos <- rep(0, minimumohNum)
-      names(steroidSkCohPos) <- paste0("steroidSkCohPos", 1:length(steroidSkCohPos))
     }
     # 双键
     if(length(db_position) != 0){
@@ -340,8 +335,6 @@
         else return(FALSE)
       })]
       steroidSkCdbNum <- length(steroidSkCdb_position)
-    }else{
-      steroidSkCdbNum <- 0
     }
     # 酮
     if(length(dbo_position) != 0){
@@ -350,12 +343,20 @@
         else return(FALSE)
       })]
       steroidSkCdboNum <- length(steroidSkCdbo_position)
-    }else{
-      steroidSkCdboNum <- 0
     }
   }
+  names(steroidSkCC) <- "steroidSkCC"
+  names(steroidSkCohNum) <- "steroidSkCohNum"
+  names(steroidSkCohPos) <- paste0("steroidSkCohPos", 1:length(steroidSkCohPos))
+  names(steroidSkCdbNum) <- "steroidSkCdbNum"
+  names(steroidSkCdboNum) <- "steroidSkCdboNum"
 
   # 断链甾醇骨架及其变体
+  secosteroidSkDC <- 0
+  secosteroidSkDohNum <- 0
+  secosteroidSkDohPos <- rep(0, minimumohNum)
+  secsteroidSkDdbNum <- 0
+  secsteroidSkDdboNum <- 0
   if(length(secosteroidSkeleton_derivative) != 0){
     symbols <- .GetAtomSymbol(smi = smi, atom_idx_vector = secosteroidSkeleton_derivative, scriptPath = scriptPath)
     secosteroidSkDC <- length(symbols == "C")
@@ -370,17 +371,10 @@
         secosteroidSkDohPos <- sapply(secosteroidSkDoh_position, function(x) {
           length(.GetShortestPath(smi = smi, start_atom_idx = x[2], end_atom_idx = secosteroidSkeleton_derivative[1], scriptPath = scriptPath))
         })
+        secosteroidSkDohPos <- sort(secosteroidSkDohPos)
         secosteroidSkDohPos <- secosteroidSkDohPos[1:minimumohNum]
-        names(secosteroidSkDohPos) <- paste0("secosteroidSkDohPos", 1:length(secosteroidSkDohPos))
         secosteroidSkDohPos[is.na(secosteroidSkDohPos)] <- 0
-      }else{
-        secosteroidSkDohPos <- rep(0, minimumohNum)
-        names(secosteroidSkDohPos) <- paste0("secosteroidSkDohPos", 1:length(secosteroidSkDohPos))
       }
-    }else{
-      secosteroidSkDohNum <- 0
-      secosteroidSkDohPos <- rep(0, minimumohNum)
-      names(secosteroidSkDohPos) <- paste0("secosteroidSkDohPos", 1:length(secosteroidSkDohPos))
     }
     # 双键
     if(length(db_position) != 0){
@@ -389,8 +383,6 @@
         else return(FALSE)
       })]
       secsteroidSkDdbNum <- length(secosteroidSkDdb_position)
-    }else{
-      secsteroidSkDdbNum <- 0
     }
     # 酮
     if(length(dbo_position) != 0){
@@ -399,11 +391,19 @@
         else return(FALSE)
       })]
       secsteroidSkDdboNum <- length(secsteroidSkDdbo_position)
-    }else{
-      secsteroidSkDdboNum <- 0
     }
   }
+  names(secosteroidSkDC) <- "secosteroidSkDC"
+  names(secosteroidSkDohNum) <- "secosteroidSkDohNum"
+  names(secosteroidSkDohPos) <- paste0("secosteroidSkDohPos", 1:length(secosteroidSkDohPos))
+  names(secsteroidSkDdbNum) <- "secsteroidSkDdbNum"
+  names(secsteroidSkDdboNum) <- "secsteroidSkDdboNum"
 
+  secosteroidSkCC <- 0
+  secosteroidSkCohNum <- 0
+  secosteroidSkCohPos <- rep(0, minimumohNum)
+  secsteroidSkCdbNum <- 0
+  secsteroidSkCdboNum <- 0
   # 断链甾醇骨架碳链
   if(length(secosteroidSkeleton_chain) != 0){
     symbols <- .GetAtomSymbol(smi = smi, atom_idx_vector = secosteroidSkeleton_chain, scriptPath = scriptPath)
@@ -419,17 +419,10 @@
         secosteroidSkCohPos <- sapply(secosteroidSkCoh_position, function(x) {
           length(.GetShortestPath(smi = smi, start_atom_idx = x[2], end_atom_idx = secosteroidSkeleton_chain[1], scriptPath = scriptPath))
         })
+        secosteroidSkCohPos <- sort(secosteroidSkCohPos)
         secosteroidSkCohPos <- secosteroidSkCohPos[1:minimumohNum]
-        names(secosteroidSkCohPos) <- paste0("secosteroidSkCohPos", 1:length(secosteroidSkCohPos))
         secosteroidSkCohPos[is.na(secosteroidSkCohPos)] <- 0
-      }else{
-        secosteroidSkCohPos <- rep(0, minimumohNum)
-        names(secosteroidSkCohPos) <- paste0("secosteroidSkCohPos", 1:length(secosteroidSkCohPos))
       }
-    }else{
-      secosteroidSkDohNum <- 0
-      secosteroidSkCohPos <- rep(0, minimumohNum)
-      names(secosteroidSkCohPos) <- paste0("secosteroidSkCohPos", 1:length(secosteroidSkCohPos))
     }
     # 双键
     if(length(db_position) != 0){
@@ -438,8 +431,6 @@
         else return(FALSE)
       })]
       secsteroidSkCdbNum <- length(secosteroidSkCdb_position)
-    }else{
-      secsteroidSkCdbNum <- 0
     }
     # 酮
     if(length(dbo_position) != 0){
@@ -448,17 +439,20 @@
         else return(FALSE)
       })]
       secsteroidSkCdboNum <- length(secsteroidSkCdbo_position)
-    }else{
-      secsteroidSkCdboNum <- 0
     }
   }
+  names(secosteroidSkCC) <- "secosteroidSkCC"
+  names(secosteroidSkCohNum) <- "secosteroidSkCohNum"
+  names(secosteroidSkCohPos) <- paste0("secosteroidSkCohPos", 1:length(secosteroidSkCohPos))
+  names(secsteroidSkCdbNum) <- "secsteroidSkCdbNum"
+  names(secsteroidSkCdboNum) <- "secsteroidSkCdboNum"
 
-
-  mainChainCNum <- sum(sapply(main_C_chains, function(x) {
+  mainChainC <- sum(sapply(main_C_chains, function(x) {
     length(which(.GetAtomSymbol(smi = smi, atom_idx_vector = x, scriptPath = scriptPath) == "C"))
   }))
-  names(mainChainCNum) <- "C"
+  names(mainChainC) <- "C"
+
 
   browser()
-  LipRtPredFP <- c(mainChainCNum)
+  LipRtPredFP <- c(mainChainC)
 }
