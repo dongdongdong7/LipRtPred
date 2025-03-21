@@ -140,7 +140,7 @@
 #                     scriptPath = system.file("python", "molecule_operation.py", package = "LipRtPred"))
 .searchEthanolamine <- function(smi, scriptPath){
   .GetSubstructMatches(smis = smi,
-                       SMARTS = "[OX2,P][CH2][CH2][NH;NH2]",
+                       SMARTS = "[OX2,P][CH2][CH2][NH,NH2]",
                        scriptPath = scriptPath)[[1]]
 }
 
