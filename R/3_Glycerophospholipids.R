@@ -130,7 +130,7 @@
 #                scriptPath = system.file("python", "molecule_operation.py", package = "LipRtPred"))
 .searchCholine <- function(smi, scriptPath){
   .GetSubstructMatches(smis = smi,
-                       SMARTS = "[N+](C)(C)(C)CCO",
+                       SMARTS = "[N+](C)(C)(C)CC[O,P]",
                        scriptPath = scriptPath)[[1]]
 }
 
@@ -140,7 +140,7 @@
 #                     scriptPath = system.file("python", "molecule_operation.py", package = "LipRtPred"))
 .searchEthanolamine <- function(smi, scriptPath){
   .GetSubstructMatches(smis = smi,
-                       SMARTS = "OCC[N;NH2]",
+                       SMARTS = "[OX2,P][CH2][CH2][NH;NH2]",
                        scriptPath = scriptPath)[[1]]
 }
 
@@ -150,7 +150,7 @@
 #               scriptPath = system.file("python", "molecule_operation.py", package = "LipRtPred"))
 .searchSerine <- function(smi, scriptPath){
   .GetSubstructMatches(smis = smi,
-                       SMARTS = "OCC(N)C(=O)O",
+                       SMARTS = "O[CH2][CH]([NH2])C(=O)O",
                        scriptPath = scriptPath)[[1]]
 }
 
@@ -161,5 +161,29 @@
 .searchInositol <- function(smi, scriptPath){
   .GetSubstructMatches(smis = smi,
                        SMARTS = "C1(O)C(O)C(O)C(O)C(O)C1(O)",
+                       scriptPath = scriptPath)[[1]]
+}
+
+# 6. Ethanol
+# (1) Search Ethanol
+.searchEthanol <- function(smi, scriptPath){
+  .GetSubstructMatches(smis = smi,
+                       SMARTS = "[OX2]-[CH2]-[CH3]",
+                       scriptPath = scriptPath)[[1]]
+}
+
+# 7. Threonine
+# (1) Search Threonine
+.searchThreonine <- function(smi, scriptPath){
+  .GetSubstructMatches(smis = smi,
+                       SMARTS = "C(O)(C)C([NH2])C(=O)O",
+                       scriptPath = scriptPath)[[1]]
+}
+
+# 8. Sulfonyl
+# (1) Search Sulfonyl
+.searchSulfonyl <- function(smi, scriptPath){
+  .GetSubstructMatches(smis = smi,
+                       SMARTS = "*-S(=O)(=O)-*",
                        scriptPath = scriptPath)[[1]]
 }
