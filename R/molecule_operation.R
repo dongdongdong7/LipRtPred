@@ -14,6 +14,12 @@
 # atom_idx_vector: atom index vector
 # non_traversable_atom_idx: vector of atom index that are not allowed to be traversed
 
+# Check SMILES
+.CheckSMILES <- function(smi, scriptPath){
+  reticulate::source_python(scriptPath)
+  CheckSMILES_py(smi = smi)
+}
+
 # Get the number of atom
 # .GetNumAtoms(smi = "CCCCC(=O)O",
 #              scriptPath = system.file("python", "molecule_operation.py", package = "LipRtPred"))
