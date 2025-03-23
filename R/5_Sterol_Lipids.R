@@ -15,7 +15,7 @@
 #                        scriptPath = system.file("python", "molecule_operation.py", package = "LipRtPred"))
 .searchSteroidSkeleton <- function(smi, scriptPath){
   .GetSubstructMatches(smis = smi,
-                       SMARTS = "[#6]1~[#6]~[#6]~[#6]2~[#6]3~[#6]~[#6]~[#6]4~[#6]~[#6]~[#6]~[#6]~4[#6]~3~[#6]~[#6]~[#6]~2[#6]~1",
+                       SMARTS = "[#6]1~[#6]~[#6]~[#6]2~[#6]3~[#6]~[#6]~[#6]4~[#6]~[#6]~[#6]~[#6]~4~[#6]~3~[#6]~[#6]~[#6]~2~[#6]~1",
                        scriptPath = scriptPath)[[1]]
 }
 
