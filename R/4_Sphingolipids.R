@@ -39,6 +39,7 @@
 .searchSphingosine_Chain <- function(smi, scriptPath){
   sphingosine_position <- .searchSphingosine(smi = smi, scriptPath = scriptPath)
   type <- names(sphingosine_position)[1]
+  if(is.na(type)) return(list())
   if(type == "sphingosine"){
    position <- lapply(sphingosine_position, function(x) {
      c(.TraverseMolecule(smi = smi,
