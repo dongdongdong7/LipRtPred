@@ -130,3 +130,28 @@
                       scriptPath = scriptPath)
   })
 }
+
+# Search ST Main Chains
+# .searchST_MainChains(smi = "C1[C@H](OC(=O)CCCCCCCCCCC)CC2=CC[C@@]3([H])[C@]4([H])CC[C@]([H])([C@]([H])(C)CCCC(C)C)[C@@]4(C)CC[C@]3([H])[C@@]2(C)C1",
+#                      scriptPath = system.file("python", "molecule_operation.py", package = "LipRtPred"))
+.searchST_MainChains <- function(smi, scriptPath){
+  steroidSk_position <- .searchSteroidSkeleton(smi = smi, scriptPath = scriptPath)
+  names(steroidSk_position) <- rep("steroidSk", length(steroidSk_position))
+  sterylEster_position <- .searchSterylEster(smi = smi, scriptPath = scriptPath)
+  names(sterylEster_position) <- rep("sterylEster", length(sterylEster_position))
+  sterylEsterChain_position <- .searchSterylEster_Chain(smi = smi, scriptPath = scriptPath)
+  names(sterylEsterChain_position) <- rep("sterylEsterChain", length(sterylEsterChain_position))
+  steroidSkD_position <- .searchSteroidSkeleton_Derivative(smi = smi, scriptPath = scriptPath)
+  names(steroidSkD_position) <- rep("steroidSkD", length(steroidSkD_position))
+  steroidSkC_position <- .searchSteroidSkeleton_Chain(smi = smi, scriptPath = scriptPath)
+  names(steroidSkC_position) <- rep("steroidSkC_position", length(steroidSkC_position))
+  secoSk_position <- .searchSecosteroidSkeleton(smi = smi, scriptPath = scriptPath)
+  names(secoSk_position) <- rep("secoSk", length(secoSk_position))
+  secoSkD_position <- .searchSecosteroidSkeleton_Derivative(smi = smi, scriptPath = scriptPath)
+  names(secoSkD_position) <- rep("secoSkD", length(secoSkD_position))
+  secoSkC_position <- .searchSecosteroidSkeleton_Chain(smi = smi, scriptPath = scriptPath)
+  names(secoSkC_position) <- rep("secoSkC", length(secoSkC_position))
+
+  c(steroidSk_position, sterylEster_position, sterylEsterChain_position, steroidSkD_position, steroidSkC_position,
+    secoSk_position, secoSkD_position, secoSkC_position)
+}
