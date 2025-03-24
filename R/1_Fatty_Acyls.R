@@ -38,12 +38,15 @@
 .searchAcyloxy_AlkoxyChain <- function(smi, scriptPath){
   acyloxy_position <- .searchAcyloxy(smi = smi,
                                      scriptPath = scriptPath)
-  lapply(acyloxy_position, function(x) {
-    .TraverseMolecule(smi = smi,
-                      start_atom_idx = x[3],
-                      non_traversable_atom_idx = x[-3],
-                      scriptPath = scriptPath)
-  })
+  if(length(acyloxy_position) != 0){
+    posi <- lapply(acyloxy_position, function(x) {
+      .TraverseMolecule(smi = smi,
+                        start_atom_idx = x[3],
+                        non_traversable_atom_idx = x[-3],
+                        scriptPath = scriptPath)[-1]
+    })
+  }else posi <- list()
+  return(posi)
 }
 
 # 2. Amide R1-C(=O)N-R2
@@ -77,13 +80,15 @@
 .searchAmide_AlkylaminoChain <- function(smi, scriptPath){
   amide_position <- .searchAmide(smi = smi,
                                  scriptPath = scriptPath)
-
-  lapply(amide_position, function(x) {
-    .TraverseMolecule(smi = smi,
-                      start_atom_idx = x[3],
-                      non_traversable_atom_idx = x[-3],
-                      scriptPath = scriptPath)
-  })
+  if(length(amide_position) != 0){
+    posi <- lapply(amide_position, function(x) {
+      .TraverseMolecule(smi = smi,
+                        start_atom_idx = x[3],
+                        non_traversable_atom_idx = x[-3],
+                        scriptPath = scriptPath)[-1]
+    })
+  }else posi <- list()
+  return(posi)
 }
 
 # 3. Thioester R1-C(=O)S-R2
@@ -116,12 +121,15 @@
 .searchThioester_ThioalkylChain <- function(smi, scriptPath){
   thioester_position <- .searchThioester(smi = smi,
                                          scriptPath = scriptPath)
-  lapply(thioester_position, function(x) {
-    .TraverseMolecule(smi = smi,
-                      start_atom_idx = x[3],
-                      non_traversable_atom_idx = x[-3],
-                      scriptPath = scriptPath)
-  })
+  if(length(thioester_position) != 0){
+    posi <- lapply(thioester_position, function(x) {
+      .TraverseMolecule(smi = smi,
+                        start_atom_idx = x[3],
+                        non_traversable_atom_idx = x[-3],
+                        scriptPath = scriptPath)[-1]
+    })
+  }else posi <- list()
+  return(posi)
 }
 
 # 4. Fatty alcohols R-C-OH
@@ -255,17 +263,20 @@
 }
 
 # (2) Search fatty ethers chain
-# .searchFattyEthers_chain(smi = "C(CCCCCCC/C=C\\C=C\\O/C=C/C=C\\CC)",
-#                          scriptPath = system.file("python", "molecule_operation.py", package = "LipRtPred"))
+.searchFattyEthers_chain(smi = "C(CCCCCCC/C=C\\C=C\\O/C=C/C=C\\CC)",
+                         scriptPath = system.file("python", "molecule_operation.py", package = "LipRtPred"))
 .searchFattyEthers_chain <- function(smi, scriptPath){
   fattyEthers_position <- .searchFattyEthers(smi = smi,
                                              scriptPath = scriptPath)
-  lapply(fattyEthers_position, function(x) {
-    .TraverseMolecule(smi = smi,
-                      start_atom_idx = x[2],
-                      non_traversable_atom_idx = c(),
-                      scriptPath = scriptPath)
-  })
+  if(length(fattyEthers_position) != 0){
+    posi <- lapply(fattyEthers_position, function(x) {
+      .TraverseMolecule(smi = smi,
+                        start_atom_idx = x[2],
+                        non_traversable_atom_idx = c(),
+                        scriptPath = scriptPath)[-1]
+    })
+  }else posi <- list()
+  return(posi)
 }
 
 # 8. Hydrocarbons
