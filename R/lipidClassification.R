@@ -22,19 +22,16 @@
 
   # Whether Sphingolipid
   sphingosie_position <- .searchSphingosine(smi = smi, scriptPath = scriptPath)
-  spisulosine_position <- .searchSpisulosine(smi = smi, scriptPath = scriptPath)
 
-  if(length(sphingosie_position) != 0 | length(spisulosine_position) != 0) return("Sphingolipid")
+  if(length(sphingosie_position) != 0) return("Sphingolipid")
 
   # Whether Glycerolipid or Glycerophospholipid
   glycerolEster_position <- .searchGlycerolEster(smi = smi, scriptPath = scriptPath)
   glycerolEther_position <- .searchGlycerolEther(smi = smi, scriptPath = scriptPath)
-  dihydroxyacetoneEster_position <- .searchDihydroxyacetoneEster(smi = smi, scriptPath = scriptPath)
-  dihydroxyacetoneEther_position <- .searchDihydroxyacetoneEther(smi = smi, scriptPath = scriptPath)
   glycerolPhosphate_position <- .searchGlycerolPhosphate(smi = smi, scriptPath = scriptPath)
 
   if(length(glycerolPhosphate_position) != 0) return("Glycerophospholipid")
-  if(length(glycerolEster_position) != 0 | length(glycerolEther_position) != 0 | length(dihydroxyacetoneEster_position) != 0 | length(dihydroxyacetoneEther_position) != 0) return("Glycerolipid")
+  if(length(glycerolEster_position) != 0 | length(glycerolEther_position) != 0) return("Glycerolipid")
 
   # Whether Fatty Acyls
   acyloxy_position <- .searchAcyloxy(smi = smi, scriptPath = scriptPath)
