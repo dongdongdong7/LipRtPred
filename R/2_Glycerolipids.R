@@ -136,75 +136,20 @@
   }
 }
 
-# # 2. Dihydroxyacetone (DHA)
-# # (1) Search dihydroxyacetone
-# # .searchDihydroxyacetone(smi = "C(=O)(COP(=O)(O)O)COCCCCCCCCCCCCCCCC",
-# #                         scriptPath = system.file("python", "molecule_operation.py", package = "LipRtPred"))
-# .searchDihydroxyacetone <- function(smi, scriptPath){
-#   .GetSubstructMatches(smis = smi,
-#                        SMARTS = "C(O)C(=O)C(O)",
-#                        scriptPath = scriptPath)[[1]]
-# }
-#
-# # (2) Search Dihydroxyacetone Ester
-# # .searchDihydroxyacetoneEster(smi = "C(OC(CCCCCCCCCCCCCCC)=O)C(=O)COP(=O)(O)O",
-# #                              scriptPath = system.file("python", "molecule_operation.py", package = "LipRtPred"))
-# .searchDihydroxyacetoneEster <- function(smi, scriptPath){
-#   dihydroxyacetone_position <- .searchDihydroxyacetone(smi = smi,
-#                                                        scriptPath = scriptPath)
-#   acyloxy_position <- .searchAcyloxy(smi = smi, scriptPath = scriptPath)
-#   if(length(acyloxy_position) == 0) return(list())
-#   dihydroxyacetoneEster_logical <- sapply(acyloxy_position, function(x) {
-#     if(x[3] %in% unlist(dihydroxyacetone_position)) return(TRUE)
-#     else return(FALSE)
-#   })
-#   dihydroxyacetoneEster_position <- acyloxy_position[dihydroxyacetoneEster_logical]
-#   names(dihydroxyacetoneEster_position) <- rep("sn1", length(dihydroxyacetoneEster_position))
-#   return(dihydroxyacetoneEster_position)
-# }
-#
-# # (3) Search Dihydroxyacetone Ester Chain
-# # .searchDihydroxyacetoneEster_Chain(smi = "C(OC(CCCCCCCCCCCCCCC)=O)C(=O)COP(=O)(O)O",
-# #                                    scriptPath = system.file("python", "molecule_operation.py", package = "LipRtPred"))
-# .searchDihydroxyacetoneEster_Chain <- function(smi, scriptPath){
-#   dihydroxyacetoneEster_position <- .searchDihydroxyacetoneEster(smi = smi, scriptPath = scriptPath)
-#   lapply(dihydroxyacetoneEster_position, function(x) {
-#     .TraverseMolecule(smi = smi,
-#                       start_atom_idx = x[1],
-#                       non_traversable_atom_idx = x[-1],
-#                       scriptPath = scriptPath)
-#   })
-# }
-#
-# # (4) Search Dihydroxyacetone Ether
-# # .searchDihydroxyacetoneEther(smi = "C(=O)(COP(=O)(O)O)COCCCCCCCCCCCCCCCC",
-# #                              scriptPath = system.file("python", "molecule_operation.py", package = "LipRtPred"))
-# .searchDihydroxyacetoneEther <- function(smi, scriptPath){
-#   dihydroxyacetone_position <- .searchDihydroxyacetone(smi = smi,
-#                                                        scriptPath = scriptPath)
-#   dihydroxyacetoneEther_position <- .GetSubstructMatches(smis = smi,
-#                                                          SMARTS = "[C;!$(C=O)]-O-[C;$(C-C(=O)-C-O)]",
-#                                                          scriptPath = scriptPath)[[1]]
-#   if(length(dihydroxyacetoneEther_position) == 0) return(list())
-#   dihydroxyacetoneEther_logical <- sapply(dihydroxyacetoneEther_position, function(x) {
-#     if(all(x[c(2,3)] %in% unlist(dihydroxyacetone_position))) return(TRUE)
-#     else return(FALSE)
-#   })
-#   dihydroxyacetoneEther_position <- dihydroxyacetoneEther_position[dihydroxyacetoneEther_logical]
-#   names(dihydroxyacetoneEther_position) <- rep("sn1", length(dihydroxyacetoneEther_position))
-#   return(dihydroxyacetoneEther_position)
-# }
-#
-# # (5) Search Dihydroxyacetone Ether Chain
-# # .searchDihydroxyacetoneEther_Chain(smi = "C(=O)(COP(=O)(O)O)COCCCCCCCCCCCCCCCC",
-# #                                    scriptPath = system.file("python", "molecule_operation.py", package = "LipRtPred"))
-# .searchDihydroxyacetoneEther_Chain <- function(smi, scriptPath){
-#   dihydroxyacetoneEther_position <- .searchDihydroxyacetoneEther(smi = smi,
-#                                                                  scriptPath = scriptPath)
-#   lapply(dihydroxyacetoneEther_position, function(x) {
-#     .TraverseMolecule(smi = smi,
-#                       start_atom_idx = x[1],
-#                       non_traversable_atom_idx = x[-1],
-#                       scriptPath = scriptPath)
-#   })
-# }
+# Search GL Main Chains
+# .searchGL_MainChains(smi = "OC[C@]1(OCC[C@H](C)CCC[C@H](C)CCC[C@H](C)CCC[C@@H](CC[C@@H](C)CCC[C@@H](C)CCC[C@@H](C)CCC[C@@H](C)CCO[C@@]([H])(CO)COCC[C@H](C)CCC[C@H](C)CCC[C@H](C)CCC[C@H](C)CC[C@@H](C)CCC[C@@H](C)CCC[C@@H](C)CCC[C@@H](C)CCOC1)C)[H]",
+#                      scriptPath = system.file("python", "molecule_operation.py", package = "LipRtPred"))
+.searchGL_MainChains <- function(smi, scriptPath){
+  glycerol_position <- .searchGlycerol(smi = smi, scriptPath = scriptPath)
+  names(glycerol_position) <- rep("glycerol", length(glycerol_position))
+  glycerolEster_position <- .searchGlycerolEster(smi = smi, scriptPath = scriptPath)
+  names(glycerolEster_position) <- rep("glycerolEster", length(glycerolEster_position))
+  glycerolEther_position <- .searchGlycerolEther(smi = smi, scriptPath = scriptPath)
+  names(glycerolEther_position) <- rep("glycerolEther", length(glycerolEther_position))
+  glycerolEsterChain_position <- .searchGlycerolEster_Chain(smi = smi, scriptPath = scriptPath)
+  names(glycerolEsterChain_position) <- rep("glycerolEsterChain", length(glycerolEsterChain_position))
+  glycerolEtherChain_position <- .searchGlycerolEther_Chain(smi = smi, scriptPath = scriptPath)
+  names(glycerolEtherChain_position) <- rep("glycerolEtherChain", length(glycerolEtherChain_position))
+
+  c(glycerol_position, glycerolEster_position, glycerolEther_position, glycerolEsterChain_position, glycerolEtherChain_position)
+}
