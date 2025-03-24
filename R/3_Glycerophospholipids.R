@@ -21,16 +21,14 @@
                        scriptPath = scriptPath)[[1]]
 }
 
-# 2. Phosphate group
-# (1) Search phosphate group
-# .searchPhosphate(smi = "C(O[C@H]1[C@H](O)[C@@H](O)[C@H](O)[C@@H](COP(=O)(O)OCCN)O1)[C@]([H])(OC(CCCCCCC/C=C\\CCCCCC)=O)CO/C=C\\CCCCCCCCCCCCCC",
-#                  scriptPath = system.file("python", "molecule_operation.py", package = "LipRtPred"))
-# .searchPhosphate(smi = "C(CN)P(OC[C@]([H])(NC(=O)CCCCCCCCCCCCC)[C@]([H])(O)/C=C/CCCCCCCCCCCCC)(=O)O",
-#                  scriptPath = system.file("python", "molecule_operation.py", package = "LipRtPred"))
-.searchPhosphate <- function(smi, scriptPath){
-  .GetSubstructMatches(smis = smi,
-                       SMARTS = "P(=O)(O)(O)-*",
-                       scriptPath = scriptPath)[[1]]
+# Search GP Main Chains
+# .searchGP_MainChains(smi = "[C@]([H])(OC(CCCCCCC/C=C\\CCCCCCCC)=O)(COP(CCN)(=O)O)COC(CCCCCCCCCCCCCCC)=O",
+#                      scriptPath = system.file("python", "molecule_operation.py", package = "LipRtPred"))
+.searchGP_MainChains <- function(smi, scriptPath){
+  glycerolPhosphate_position <- .searchGlycerolPhosphate(smi = smi, scriptPath = scriptPath)
+  names(glycerolPhosphate_position) <- rep("glycerolPhosphate", length(glycerolPhosphate_position))
+
+  c(glycerolPhosphate_position)
 }
 
 # # (2) Search phosphocholine
