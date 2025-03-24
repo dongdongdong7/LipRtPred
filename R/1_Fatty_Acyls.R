@@ -350,23 +350,17 @@
   acyloxy_position <- .searchAcyloxy(smi = smi, scriptPath = scriptPath)
   names(acyloxy_position) <- rep("acyloxy", length(acyloxy_position))
   acyloxy_acylChain_position <- .searchAcyloxy_AcylChain(smi = smi, scriptPath = scriptPath)
-  names(acyloxy_acylChain_position) <- rep("acyloxy_acylChain", length(acyloxy_acylChain_position))
   acyloxy_alkoxyChain_position <- .searchAcyloxy_AlkoxyChain(smi = smi, scriptPath = scriptPath)
-  names(acyloxy_alkoxyChain_position) <- rep("acyloxy_alkoxyChain", length(acyloxy_alkoxyChain_position))
   # Amide
   amide_position <- .searchAmide(smi = smi, scriptPath = scriptPath)
   names(amide_position) <- rep("amide", length(amide_position))
   amide_acylChain_position <- .searchAmide_AcylChain(smi = smi, scriptPath = scriptPath)
-  names(amide_acylChain_position) <- rep("amide_acylChain", length(amide_acylChain_position))
   amide_alkylaminoChain_position <- .searchAmide_AlkylaminoChain(smi = smi, scriptPath = scriptPath)
-  names(amide_alkylaminoChain_position) <- rep("amide_alkylaminoChain", length(amide_alkylaminoChain_position))
   # Thioester
   thioester_position <- .searchThioester(smi = smi, scriptPath = scriptPath)
   names(thioester_position) <- rep("thioester", length(thioester_position))
   thioester_acylChain_position <- .searchThioester_AcylChain(smi = smi, scriptPath = scriptPath)
-  names(thioester_acylChain_position) <- rep("thioester_acylChain", length(thioester_acylChain_position))
   thioester_thioalkylChain_position <- .searchThioester_ThioalkylChain(smi = smi, scriptPath = scriptPath)
-  names(thioester_thioalkylChain_position) <- rep("thioester_thioalkylChain", length(thioester_thioalkylChain_position))
   # Fatty Alcohol
   fattyAlcohol_position <- .searchFattyAlcohols(smi = smi, scriptPath = scriptPath)
   names(fattyAlcohol_position) <- rep("fattyAlcohol", length(fattyAlcohol_position))
@@ -391,9 +385,81 @@
   hydrocarbons_position <- .searchHydrocarbons(smi = smi, scriptPath = scriptPath)
   names(hydrocarbons_position) <- rep("hydrocarbons", length(hydrocarbons_position))
 
-  c(acyloxy_position, acyloxy_acylChain_position, acyloxy_alkoxyChain_position,
-    amide_position, amide_acylChain_position, amide_alkylaminoChain_position,
-    thioester_position, thioester_acylChain_position, thioester_thioalkylChain_position,
+  # 酰氧基链加上酰氧基键的位置
+  if(length(acyloxy_acylChain_position) != 0){
+    acyloxy_acylChain_position <- lapply(1:length(acyloxy_acylChain_position), function(i) {
+      unique(c(acyloxy_position[[i]], acyloxy_acylChain_position[[i]]))
+    })
+  }
+  # 酰胺基链加上酰胺基键的位置
+  if(length(amide_acylChain_position) != 0){
+    amide_acylChain_position <- lapply(1:length(amide_acylChain_position), function(i) {
+      unique(c(amide_position[[i]], amide_acylChain_position[[i]]))
+    })
+  }
+  # 硫代酰碳链加上硫代酰键的位置
+  if(length(thioester_acylChain_position) != 0){
+    thioester_acylChain_position <- lapply(1:length(thioester_acylChain_position), function(i) {
+      unique(c(thioester_position[[i]], thioester_acylChain_position[[i]]))
+    })
+  }
+  # 酰氧基链加上酰氧基键的位置
+  if(length(acyloxy_alkoxyChain_position) != 0){
+    acyloxy_alkoxyChain_position <- lapply(1:length(acyloxy_alkoxyChain_position), function(i) {
+      unique(c(acyloxy_position[[i]], acyloxy_alkoxyChain_position[[i]]))
+    })
+  }
+  # 酰胺基链加上酰胺基键的位置
+  if(length(amide_alkylaminoChain_position) != 0){
+    amide_alkylaminoChain_position <- lapply(1:length(amide_alkylaminoChain_position), function(i) {
+      unique(c(amide_position[[i]], amide_alkylaminoChain_position[[i]]))
+    })
+  }
+  # 硫代酰碳链加上硫代酰键的位置
+  if(length(thioester_thioalkylChain_position) != 0){
+    thioester_thioalkylChain_position <- lapply(1:length(thioester_thioalkylChain_position), function(i) {
+      unique(c(thioester_position[[i]], thioester_thioalkylChain_position[[i]]))
+    })
+  }
+  main_Chains <- c(acyloxy_acylChain_position, amide_acylChain_position, thioester_acylChain_position,
+                   acyloxy_alkoxyChain_position, amide_alkylaminoChain_position, thioester_thioalkylChain_position)
+  namesofmainChains <- c(rep("acyloxy_acylChain", length(acyloxy_acylChain_position)),
+                         rep("amide_acylChain", length(amide_acylChain_position)),
+                         rep("thioester_acylChain", length(thioester_acylChain_position)),
+                         rep("acyloxy_alkoxyChain", length(acyloxy_alkoxyChain_position)),
+                         rep("amide_alkylaminoChain", length(amide_alkylaminoChain_position)),
+                         rep("thioester_thioalkylChain", length(thioester_thioalkylChain_position)))
+  for(head in c("acyloxy_acylChain", "amide_acylChain", "thioester_acylChain", "acyloxy_alkoxyChain", "amide_alkylaminoChain", "thioester_thioalkylChain")){
+    is <- which(namesofmainChains == head)
+    if(length(is) == 0) next
+    for(i in is){
+      x <- main_Chains[[i]]
+      if(all(x == "none")) next
+      for(j in (1:length(main_Chains))[-i]){
+        y <- main_Chains[[j]]
+        if(all(y == "none")) next
+        if(all(y[1:3] %in% x[-c(1:3)])) main_Chains[[j]] <- "none"
+      }
+    }
+  }
+  main_Chains <- lapply(1:length(main_Chains), function(i) {
+    x <- main_Chains[[i]]
+    if(all(x == "none")) return(NULL)
+    else{
+      if(namesofmainChains[i] %in% c("acyloxy_acylChain", "amide_acylChain", "thioester_acylChain")){
+        return(x[-c(2,3)])
+      }else{
+        return(x[-c(1,2,3)])
+      }
+    }
+  })
+  names(main_Chains) <- namesofmainChains
+  main_Chains <- main_Chains[sapply(main_Chains, function(x) {length(x) != 0})]
+
+  c(main_Chains,
+    acyloxy_position,
+    amide_position,
+    thioester_position,
     fattyAlcohol_position, fattyAlcoholChain_position,
     fattyAldehyde_position, fattyAldehydeChain_position,
     fattyNitrile_position, fattyNitrileChain_position,
