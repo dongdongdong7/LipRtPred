@@ -147,9 +147,25 @@
   glycerolEther_position <- .searchGlycerolEther(smi = smi, scriptPath = scriptPath)
   names(glycerolEther_position) <- rep("glycerolEther", length(glycerolEther_position))
   glycerolEsterChain_position <- .searchGlycerolEster_Chain(smi = smi, scriptPath = scriptPath)
-  names(glycerolEsterChain_position) <- rep("glycerolEsterChain", length(glycerolEsterChain_position))
   glycerolEtherChain_position <- .searchGlycerolEther_Chain(smi = smi, scriptPath = scriptPath)
-  names(glycerolEtherChain_position) <- rep("glycerolEtherChain", length(glycerolEtherChain_position))
 
-  c(glycerol_position, glycerolEster_position, glycerolEther_position, glycerolEsterChain_position, glycerolEtherChain_position)
+  main_chains <- c(glycerolEsterChain_position, glycerolEtherChain_position)
+  if(length(main_chains) != 0){
+    for(i in 1:length(main_chains)){
+      x <- main_chains[[i]]
+      if(all(x == "none")) next
+      for(j in (1:length(main_chains))[-i]){
+        y <- main_chains[[j]]
+        if(all(y == "none")) next
+        if(any(y %in% x)) main_chains[[j]] <- "none"
+      }
+    }
+    main_chains <- lapply(main_chains, function(x){
+      if(all(x == "none")) return(NULL)
+      else return(x)
+    })
+    main_chains <- main_chains[!sapply(main_chains, is.null)]
+  }
+
+  c(main_chains, glycerol_position, glycerolEster_position, glycerolEther_position)
 }
