@@ -45,6 +45,10 @@
                         non_traversable_atom_idx = x[-3],
                         scriptPath = scriptPath)[-1]
     })
+    posi <- posi[sapply(posi, function(x) {
+      if(length(x) == 0) return(FALSE)
+      else return(TRUE)
+    })]
   }else posi <- list()
   return(posi)
 }
@@ -87,6 +91,10 @@
                         non_traversable_atom_idx = x[-3],
                         scriptPath = scriptPath)[-1]
     })
+    posi <- posi[sapply(posi, function(x) {
+      if(length(x) == 0) return(FALSE)
+      else return(TRUE)
+    })]
   }else posi <- list()
   return(posi)
 }
@@ -128,6 +136,10 @@
                         non_traversable_atom_idx = x[-3],
                         scriptPath = scriptPath)[-1]
     })
+    posi <- posi[sapply(posi, function(x) {
+      if(length(x) == 0) return(FALSE)
+      else return(TRUE)
+    })]
   }else posi <- list()
   return(posi)
 }
@@ -231,7 +243,7 @@
 # .searchFattyNitriles_Chain(smi = "N#CCCCCC#CC#CC#CCCCCC#N",
 #                           scriptPath = system.file("python", "molecule_operation.py", package = "LipRtPred"))
 .searchFattyNitriles_Chain <- function(smi, scriptPath){
-  fattyNitries_position <- .searchFattyNitries(smi = smi,
+  fattyNitries_position <- .searchFattyNitriles(smi = smi,
                                                scriptPath = scriptPath)
   lapply(fattyNitries_position, function(x) {
     .TraverseMolecule(smi = smi,
@@ -263,8 +275,8 @@
 }
 
 # (2) Search fatty ethers chain
-.searchFattyEthers_chain(smi = "C(CCCCCCC/C=C\\C=C\\O/C=C/C=C\\CC)",
-                         scriptPath = system.file("python", "molecule_operation.py", package = "LipRtPred"))
+# .searchFattyEthers_chain(smi = "C(CCCCCCC/C=C\\C=C\\O/C=C/C=C\\CC)",
+#                          scriptPath = system.file("python", "molecule_operation.py", package = "LipRtPred"))
 .searchFattyEthers_chain <- function(smi, scriptPath){
   fattyEthers_position <- .searchFattyEthers(smi = smi,
                                              scriptPath = scriptPath)
@@ -275,6 +287,10 @@
                         non_traversable_atom_idx = c(),
                         scriptPath = scriptPath)[-1]
     })
+    posi <- posi[sapply(posi, function(x) {
+      if(length(x) == 0) return(FALSE)
+      else return(TRUE)
+    })]
   }else posi <- list()
   return(posi)
 }
@@ -324,4 +340,63 @@
     hydrocarbons_position <- list()
   }
   return(hydrocarbons_position)
+}
+
+# Search FA Main Chains
+# .searchFA_MainChains(smi = "[C@@H]1([C@H](O)[C@H](OP(=O)(O)O)[C@@H](COP(O)(=O)OP(O)(=O)OCC(C)([C@@H](O)C(=O)NCCC(=O)NCCSC(=O)C/C=C\\CC(O)=O)C)O1)N1C=NC2C(N)=NC=NC1=2",
+#                      scriptPath = system.file("python", "molecule_operation.py", package = "LipRtPred"))
+.searchFA_MainChains <- function(smi, minium_C = 6, scriptPath){
+  # Acyloxy
+  acyloxy_position <- .searchAcyloxy(smi = smi, scriptPath = scriptPath)
+  names(acyloxy_position) <- rep("acyloxy", length(acyloxy_position))
+  acyloxy_acylChain_position <- .searchAcyloxy_AcylChain(smi = smi, scriptPath = scriptPath)
+  names(acyloxy_acylChain_position) <- rep("acyloxy_acylChain", length(acyloxy_acylChain_position))
+  acyloxy_alkoxyChain_position <- .searchAcyloxy_AlkoxyChain(smi = smi, scriptPath = scriptPath)
+  names(acyloxy_alkoxyChain_position) <- rep("acyloxy_alkoxyChain", length(acyloxy_alkoxyChain_position))
+  # Amide
+  amide_position <- .searchAmide(smi = smi, scriptPath = scriptPath)
+  names(amide_position) <- rep("amide", length(amide_position))
+  amide_acylChain_position <- .searchAmide_AcylChain(smi = smi, scriptPath = scriptPath)
+  names(amide_acylChain_position) <- rep("amide_acylChain", length(amide_acylChain_position))
+  amide_alkylaminoChain_position <- .searchAmide_AlkylaminoChain(smi = smi, scriptPath = scriptPath)
+  names(amide_alkylaminoChain_position) <- rep("amide_alkylaminoChain", length(amide_alkylaminoChain_position))
+  # Thioester
+  thioester_position <- .searchThioester(smi = smi, scriptPath = scriptPath)
+  names(thioester_position) <- rep("thioester", length(thioester_position))
+  thioester_acylChain_position <- .searchThioester_AcylChain(smi = smi, scriptPath = scriptPath)
+  names(thioester_acylChain_position) <- rep("thioester_acylChain", length(thioester_acylChain_position))
+  thioester_thioalkylChain_position <- .searchThioester_ThioalkylChain(smi = smi, scriptPath = scriptPath)
+  names(thioester_thioalkylChain_position) <- rep("thioester_thioalkylChain", length(thioester_thioalkylChain_position))
+  # Fatty Alcohol
+  fattyAlcohol_position <- .searchFattyAlcohols(smi = smi, scriptPath = scriptPath)
+  names(fattyAlcohol_position) <- rep("fattyAlcohol", length(fattyAlcohol_position))
+  fattyAlcoholChain_position <- .searchFattyAlcohols_Chain(smi = smi, scriptPath = scriptPath)
+  names(fattyAlcoholChain_position) <- rep("fattyAlcoholChain", length(fattyAlcoholChain_position))
+  # Fatty Aldehyde
+  fattyAldehyde_position <- .searchFattyAldehydes(smi = smi, scriptPath = scriptPath)
+  names(fattyAldehyde_position) <- rep("fattyAldehyde", length(fattyAldehyde_position))
+  fattyAldehydeChain_position <- .searchFattyAldehydes_Chain(smi = smi, scriptPath = scriptPath)
+  names(fattyAldehydeChain_position) <- rep("fattyAldehydeChain", length(fattyAldehydeChain_position))
+  # Fatty Nitrile
+  fattyNitrile_position <- .searchFattyNitriles(smi = smi, scriptPath = scriptPath)
+  names(fattyNitrile_position) <- rep("fattyNitrile", length(fattyNitrile_position))
+  fattyNitrileChain_position <- .searchFattyNitriles_Chain(smi = smi, scriptPath = scriptPath)
+  names(fattyNitrileChain_position) <- rep("fattyNitrileChain", length(fattyNitrileChain_position))
+  # Fatty Ether
+  fattyEther_position <- .searchFattyEthers(smi = smi, scriptPath = scriptPath)
+  names(fattyEther_position) <- rep("fattyEther", length(fattyEther_position))
+  fattyEtherChain_position <- .searchFattyEthers_chain(smi = smi, scriptPath = scriptPath)
+  names(fattyEtherChain_position) <- rep("fattyEtherChain", length(fattyEtherChain_position))
+  # hydrocarbons
+  hydrocarbons_position <- .searchHydrocarbons(smi = smi, scriptPath = scriptPath)
+  names(hydrocarbons_position) <- rep("hydrocarbons", length(hydrocarbons_position))
+
+  c(acyloxy_position, acyloxy_acylChain_position, acyloxy_alkoxyChain_position,
+    amide_position, amide_acylChain_position, amide_alkylaminoChain_position,
+    thioester_position, thioester_acylChain_position, thioester_thioalkylChain_position,
+    fattyAlcohol_position, fattyAlcoholChain_position,
+    fattyAldehyde_position, fattyAldehydeChain_position,
+    fattyNitrile_position, fattyNitrileChain_position,
+    fattyEther_position, fattyEtherChain_position,
+    hydrocarbons_position)
 }
