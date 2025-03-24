@@ -47,6 +47,7 @@
                          scriptPath = scriptPath),
        x[2],x[6])
    })
+   names(position) <- rep("sphingosine_chain", length(position))
   }else if(type == "spisulosine"){
     position <- lapply(sphingosine_position, function(x) {
       c(.TraverseMolecule(smi = smi,
@@ -55,6 +56,7 @@
                           scriptPath = scriptPath),
         x[5])
     })
+    names(position) <- rep("spisulosine_chain", length(position))
   }else stop("Unkonwn sphingosine type")
   return(position)
 }
@@ -82,6 +84,27 @@
 }
 
 # (4) Search sphingosine ester
+# .searchSphEster(smi = "C(OC(=O)CCCCCCCCCCCCCCC)[C@]([H])(NC(CCCCCCCCCCCCCCC)=O)[C@H](O)/C=C/CCCCCCCCCCCCC",
+#                 scriptPath = system.file("python", "molecule_operation.py", package = "LipRtPred"))
+.searchSphEster <- function(smi, scriptPath){
+  sph_position <- .searchSphingosine(smi = smi, scriptPath = scriptPath)
+  if(length(sph_position) > 1) warnings("More than one sphingosine skeleton!")
+  if(names(sph_position)[1] == "sphingosine") sph_O_position <- unlist(sph_position)[c(2, 6)]
+  else if(names(sph_position)[1] == "spisulosine") sph_O_position <- unlist(sph_position)[5]
+  acyloxy_position <- .searchAcyloxy(smi = smi, scriptPath = scriptPath)
+  if(length(acyloxy_position) == 0) sphEster_chain <- list()
+  else{
+    l <- sapply(acyloxy_position, function(x) {
+      if(x[3] %in% sph_O_position) return(TRUE)
+      else return(FALSE)
+    })
+    sphEster_position <- acyloxy_position[l]
+  }
+  names(sphEster_position) <- "sphEster"
+  return(sphEster_position)
+}
+
+# (5) Search sphingosine ester chain
 # .searchSphEster_Chain(smi = "C(OC(=O)CCCCCCCCCCCCCCC)[C@]([H])(NC(CCCCCCCCCCCCCCC)=O)[C@H](O)/C=C/CCCCCCCCCCCCC",
 #                       scriptPath = system.file("python", "molecule_operation.py", package = "LipRtPred"))
 .searchSphEster_Chain <- function(smi, scriptPath){
@@ -101,6 +124,19 @@
   }
   names(sphEster_chain) <- "SphEsterChain"
   return(sphEster_chain)
+}
+
+# Search SP Main Chains
+# .searchSP_MainChains(smi = "C(OC(=O)CCCCCCCCCCCCCCC)[C@]([H])(NC(CCCCCCCCCCCCCCC)=O)[C@H](O)/C=C/CCCCCCCCCCCCC",
+#                      scriptPath = system.file("python", "molecule_operation.py", package = "LipRtPred"))
+.searchSP_MainChains <- function(smi, scriptPath){
+  sphingosine_position <- .searchSphingosine(smi = smi, scriptPath = scriptPath)
+  sphingosineChain_position <- .searchSphingosine_Chain(smi = smi, scriptPath = scriptPath)
+  sphAmide_acylChain_position <- .searchSphAmide_AcylChain(smi = smi, scriptPath = scriptPath)
+  sphEster_position <- .searchSphEster(smi = smi, scriptPath = scriptPath)
+  sphEsterChain_position <- .searchSphEster_Chain(smi = smi, scriptPath = scriptPath)
+
+  c(sphingosine_position, sphingosineChain_position, sphAmide_acylChain_position, sphEster_position, sphEsterChain_position)
 }
 
 # # 1. Fatty Chain Head
