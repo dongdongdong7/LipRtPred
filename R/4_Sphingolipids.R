@@ -93,7 +93,7 @@
   if(names(sph_position)[1] == "sphingosine") sph_O_position <- unlist(sph_position)[c(2, 6)]
   else if(names(sph_position)[1] == "spisulosine") sph_O_position <- unlist(sph_position)[5]
   acyloxy_position <- .searchAcyloxy(smi = smi, scriptPath = scriptPath)
-  if(length(acyloxy_position) == 0) sphEster_chain <- list()
+  if(length(acyloxy_position) == 0) sphEster_position <- list()
   else{
     l <- sapply(acyloxy_position, function(x) {
       if(x[3] %in% sph_O_position) return(TRUE)
@@ -101,7 +101,7 @@
     })
     sphEster_position <- acyloxy_position[l]
   }
-  names(sphEster_position) <- "sphEster"
+  names(sphEster_position) <- rep("sphEster", length(sphEster_position))
   return(sphEster_position)
 }
 
