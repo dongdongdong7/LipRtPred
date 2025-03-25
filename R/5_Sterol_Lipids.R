@@ -144,7 +144,7 @@
   steroidSkD_position <- .searchSteroidSkeleton_Derivative(smi = smi, scriptPath = scriptPath)
   names(steroidSkD_position) <- rep("steroidSkD", length(steroidSkD_position))
   steroidSkC_position <- .searchSteroidSkeleton_Chain(smi = smi, scriptPath = scriptPath)
-  names(steroidSkC_position) <- rep("steroidSkC_position", length(steroidSkC_position))
+  names(steroidSkC_position) <- rep("steroidSkC", length(steroidSkC_position))
   secoSk_position <- .searchSecosteroidSkeleton(smi = smi, scriptPath = scriptPath)
   names(secoSk_position) <- rep("secoSk", length(secoSk_position))
   secoSkD_position <- .searchSecosteroidSkeleton_Derivative(smi = smi, scriptPath = scriptPath)
