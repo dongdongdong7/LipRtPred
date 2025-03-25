@@ -80,7 +80,7 @@
     amide_acylChain_position <- .searchAmide_AcylChain(smi = smi, scriptPath = scriptPath)
     amide_acylChain_position <- amide_acylChain_position[l]
   }
-  names(amide_acylChain_position) <- "SphAmide_AcylChain"
+  names(amide_acylChain_position) <- rep("SphAmide_AcylChain", length(amide_acylChain_position))
   return(amide_acylChain_position)
 }
 
@@ -123,7 +123,7 @@
     sphEster_chain <- .searchAcyloxy_AcylChain(smi = smi, scriptPath = scriptPath)
     sphEster_chain <- sphEster_chain[l]
   }
-  names(sphEster_chain) <- "SphEsterChain"
+  names(sphEster_chain) <- rep("SphEsterChain", length(sphEster_chain))
   return(sphEster_chain)
 }
 
