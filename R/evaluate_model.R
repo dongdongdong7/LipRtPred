@@ -25,18 +25,18 @@ predictRt <- function(testingDf, model){
 #' @export
 #' @examples
 #' evaluate_model(testingDf = testingDf, model = model_rf)
-evaluate_model <- function(testingDf, model){
+evaluate_model <- function(testingDf, model, digits = 3){
   if(!any(colnames(testingDf) == "rt")){
     stop("testingDf do not have rt column!")
   }
   predDf <- predictRt(testingDf = testingDf, model = model)
   x <- testingDf[, !colnames(testingDf) %in% c("id", "smiles", "rt")]
   rt_max <- ceiling(max(max(predDf$rt), max(predDf$rt_pred))) + 1
-  rmse <- round(sqrt(mean((predDf$rt - predDf$rt_pred)^2)), 2)
-  mae <- round(mean(abs(predDf$rt - predDf$rt_pred)), 2)
+  rmse <- round(sqrt(mean((predDf$rt - predDf$rt_pred)^2)), digits)
+  mae <- round(mean(abs(predDf$rt - predDf$rt_pred)), digits)
   SSE <- sum((predDf$rt_pred - predDf$rt)^2)
   SST <- sum((mean(predDf$rt) - predDf$rt)^2)
-  r_squared <- round(1- (SSE / SST), 2)
+  r_squared <- round(1- (SSE / SST), digits)
   n <- nrow(x)
   p <- ncol(x)
   if(n > p){
@@ -56,9 +56,9 @@ evaluate_model <- function(testingDf, model){
     ggplot2::geom_point(ggplot2::aes(rt, rt_pred), colour = "#5E676F") +
     ggplot2::labs(title = paste0("Predicted vs Real - ", model$method), x="Observed RT", y = "Predicted RT") +
     ggplot2::xlim(0, rt_max) + ggplot2::ylim(0, rt_max) +
-    ggplot2::annotation_custom(stats_table, xmin = 1, xmax = 2, ymin = rt_max - 4, ymax = rt_max - 1) +
+    ggplot2::annotation_custom(stats_table, xmin = rt_max * 0.125, xmax = rt_max * 0.250, ymin = rt_max * 0.750, ymax = rt_max  * 0.875) +
     ggplot2::theme_classic() +
     ggplot2::theme(plot.title = ggplot2::element_text(color = "#384049", face = "bold", hjust = 0.5), axis.line = ggplot2::element_line(colour = "#384049"), axis.text = ggplot2::element_text(colour = "#384049"), axis.title = ggplot2::element_text(colour = "#384049")) +
     ggplot2::geom_abline(intercept = 0, slope = 1, color = "#D02937")
-  return(list(MAE = mae, RMSE = rmse, R2 = r_squared, R2_adjust = r_squared_adjust, p = p))
+  return(list(predDf = predDf, MAE = mae, RMSE = rmse, R2 = r_squared, R2_adjust = r_squared_adjust, p = p))
 }
