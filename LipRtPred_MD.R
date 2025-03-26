@@ -219,6 +219,7 @@ C_C_count <- function(smi, start_atom_idx, end_atom_idx){
   })
   return(sum(matchNum))
 }
+
 # Calculate OH number on FA's C-Chains
 # .cal_h(smi = "C(CC/C=C\\C/C=C\\CC(O)C(O)C/C=C\\C/C=C\\C/C=C\\CC)(=O)O",
 #        min_C = 1, max_C = 24,
@@ -287,7 +288,7 @@ C_C_count <- function(smi, start_atom_idx, end_atom_idx){
 # Search glycerol position
 # .searchGlycerol(smi = "C(OC(=O)CCCCCCCCCCCCCCCCC)[C@]([H])(OC(CCCCCCCCCCCCCCC)=O)COC(CCCCCCCCCCC)=O",
 #                 scriptPath = system.file("python", "SMARTS.py", package = "LipRtPred"))
-.searchGlycerol <- function(smi, scriptPath){
+.searchGlycerol_remove <- function(smi, scriptPath){
   return(.smartsMatch(smiles = smi, SMARTS = "[CH2;$(C-O)]-[CH;$(C-O)]-[CH2;$(C-O)]", scriptPath = scriptPath)[[1]])
 }
 # Search glycerol FA
