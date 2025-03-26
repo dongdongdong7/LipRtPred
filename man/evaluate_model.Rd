@@ -7,7 +7,7 @@
 \usage{
 predictRt(testingDf, model)
 
-evaluate_model(testingDf, model)
+evaluate_model(testingDf, model, digits = 3)
 }
 \arguments{
 \item{testingDf}{A testing data frame.}
