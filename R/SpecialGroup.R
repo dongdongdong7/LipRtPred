@@ -28,7 +28,7 @@
 #               scriptPath = system.file("python", "molecule_operation.py", package = "LipRtPred"))
 .searchHexose <- function(smi, scriptPath){
   .GetSubstructMatches(smis = smi,
-                       SMARTS = "CC1C([O,N,P,S])C([O,N,P,S])C([O,N,P,S])C([O,N,P,S])O1",
+                       SMARTS = "[CH3,C&$(C-O)&!$(C=O)]C1C([O,N,P,S])C([O,N,P,S])C([O,N,P,S])C([O,N,P,S])O1",
                        scriptPath = scriptPath)[[1]]
 }
 
@@ -115,5 +115,15 @@
 .searchPhosphate <- function(smi, scriptPath){
   .GetSubstructMatches(smis = smi,
                        SMARTS = "P(=O)(O)(O)-*",
+                       scriptPath = scriptPath)[[1]]
+}
+
+# 12. Glucuronic acid
+# (1) Search glucuronic acid
+# .searchGluAcid(smi = "C(OC(=O)CC=CCC)C(OCCCCC)C(OC1C(O)C(O)C(O)C(C(=O)O)O1)",
+#                scriptPath = system.file("python", "molecule_operation.py", package = "LipRtPred"))
+.searchGluAcid <- function(smi, scriptPath){
+  .GetSubstructMatches(smis = smi,
+                       SMARTS = "C(=O)([OH])C1C([O,N,P,S])C([O,N,P,S])C([O,N,P,S])C([O,N,P,S])O1",
                        scriptPath = scriptPath)[[1]]
 }

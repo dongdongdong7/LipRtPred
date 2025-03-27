@@ -107,11 +107,15 @@
   sulfonyl_position <- .searchSulfonyl(smi = smi, scriptPath = scriptPath)
   sulfonylNum <- length(sulfonyl_position)
   names(sulfonylNum) <- "sulfonylNum"
+  # Glucuronic acid
+  gluacid_position <- .searchGluAcid(smi = smi, scriptPath = scriptPath)
+  gluacidNum <- length(gluacid_position)
+  names(gluacidNum) <- "gluacidNum"
 
   # Remove special group
   remove_position <- unlist(c(glcerol_position, phosphate_position, betaine_position, pentose_position, hexose_position,
                               choline_position, ethanolamine_position, serine_position, inositol_position, ethanol_position,
-                              threonine_position, carnitine_position, sulfonyl_position))
+                              threonine_position, carnitine_position, sulfonyl_position, gluacid_position))
   if(length(remove_position) != 0) remove_position <- remove_position[.GetAtomSymbol(smi = smi, atom_idx_vector = remove_position, scriptPath = scriptPath) == "C"]
   C_Chains_position <- lapply(C_Chains_position, function(x) {
     x[!x %in% remove_position]
@@ -489,7 +493,7 @@
                    stdSkCC, stdSkCohNum, stdSkCohPos, stdSkCdbNum, stdSkCktNum,
                    secSkDC, secSkDohNum, secSkDohPos, secSkDdbNum, secSkDktNum,
                    secSkCC, secSkCohNum, secSkCohPos, secSkCdbNum, secSkCktNum,
-                   glycerolNum, phosphateNum, betaineNum, pentoseNum, hexoseNum, cholineNum, ethanolamineNum, serineNum, inositolNum, ethanolNum, threonineNum, carnitineNum, sulfonylNum)
+                   glycerolNum, phosphateNum, betaineNum, pentoseNum, hexoseNum, cholineNum, ethanolamineNum, serineNum, inositolNum, ethanolNum, threonineNum, carnitineNum, sulfonylNum, gluacidNum)
 
   return(LipRtPredFP)
 }
