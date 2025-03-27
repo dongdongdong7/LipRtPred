@@ -69,7 +69,7 @@
   O_sn2 <- sapply(glycerol_position, function(x) {x[4]})
   O_sn3 <- sapply(glycerol_position, function(x) {x[6]})
   ethers_position <- .GetSubstructMatches(smis = smi,
-                                          SMARTS = "[CH2,CH3]-O-[C;!$(C=O)]",
+                                          SMARTS = "[CH2,CH]-O-[C;!$(C=O)]",
                                           scriptPath = scriptPath)[[1]]
   ethers_position <- lapply(ethers_position, function(x) {
     if(all(x[c(1,2)] %in% unlist(glycerol_position))) return(x)
