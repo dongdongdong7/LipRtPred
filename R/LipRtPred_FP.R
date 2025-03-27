@@ -103,6 +103,7 @@
   carnitine_position <- .searchCarnitine(smi = smi, scriptPath = scriptPath)
   carnitineNum <- length(carnitine_position)
   names(carnitineNum) <- "carnitineNum"
+  if(carnitineNum > 0 & cholineNum > 0) cholineNum <- cholineNum - carnitineNum # Delete choline in carnitine
   # Sulfonyl
   sulfonyl_position <- .searchSulfonyl(smi = smi, scriptPath = scriptPath)
   sulfonylNum <- length(sulfonyl_position)
@@ -113,9 +114,9 @@
   names(gluacidNum) <- "gluacidNum"
 
   # Remove special group
-  remove_position <- unlist(c(glcerol_position, phosphate_position, betaine_position, pentose_position, hexose_position,
-                              choline_position, ethanolamine_position, serine_position, inositol_position, ethanol_position,
-                              threonine_position, carnitine_position, sulfonyl_position, gluacid_position))
+  remove_position <- unique(unlist(c(glcerol_position, phosphate_position, betaine_position, pentose_position, hexose_position,
+                                     choline_position, ethanolamine_position, serine_position, inositol_position, ethanol_position,
+                                     threonine_position, carnitine_position, sulfonyl_position, gluacid_position)))
   if(length(remove_position) != 0) remove_position <- remove_position[.GetAtomSymbol(smi = smi, atom_idx_vector = remove_position, scriptPath = scriptPath) == "C"]
   C_Chains_position <- lapply(C_Chains_position, function(x) {
     x[!x %in% remove_position]
