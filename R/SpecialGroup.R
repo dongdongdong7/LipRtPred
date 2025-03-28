@@ -127,3 +127,32 @@
                        SMARTS = "C(=O)([OH])C1C([O,N,P,S])C([O,N,P,S])C([O,N,P,S])C([O,N,P,S])O1",
                        scriptPath = scriptPath)[[1]]
 }
+
+# 13. DEMA
+# (1) Search Dimethylethanolamine
+# .searchDEMA(smi = "[C@](COP(=O)(O)OCCN(C)C)([H])(OC(CCCCCCCCCCC)=O)COC(CCCCCCCCCCC)=O",
+#             scriptPath = system.file("python", "molecule_operation.py", package = "LipRtPred"))
+.searchDEMA <- function(smi, scriptPath){
+  .GetSubstructMatches(smis = smi,
+                       SMARTS = "C(O)CN([CH3])([CH3])",
+                       scriptPath = scriptPath)[[1]]
+}
+
+# 14. MMEA
+# (1) Search N-Methylethanolamine
+# .searchMMEA(smi = "[C@](COP(=O)(O)OCCNC)([H])(OC(CCCCCCCCCCCCC)=O)COC(CCCCCCCCCCCCC)=O",
+#             scriptPath = system.file("python", "molecule_operation.py", package = "LipRtPred"))
+.searchMMEA <- function(smi, scriptPath){
+  .GetSubstructMatches(smis = smi,
+                       SMARTS = "C(O)C[NH][CH3]",
+                       scriptPath = scriptPath)[[1]]
+}
+
+# 15. Sialic Acid
+# .searchSialicAcid(smi = "CC(=O)N[C@@H]1[C@H](CC(O[C@H]1[C@@H]([C@@H](CO)O)O)(C(=O)O)O)O",
+#                   scriptPath = system.file("python", "molecule_operation.py", package = "LipRtPred"))
+.searchSialicAcid <- function(smi, scriptPath){
+  .GetSubstructMatches(smis = smi,
+                       SMARTS = "C1(O)C(NC(=O)C)C(C(O)C(O)C(O))OC(O)(C(=O)O)C1",
+                       scriptPath = scriptPath)[[1]]
+}
