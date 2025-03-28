@@ -4,6 +4,7 @@
 
 from rdkit import Chem
 from rdkit.Chem import rdmolops
+from rdkit.Chem import AllChem
 
 # smi SMILES string
 # smis: SMILES string list
@@ -140,3 +141,15 @@ def TraverseMolecule_py(smi, start_atom_idx, non_traversable_atom_idx):
 
   dfs(start_atom_idx, visited = visited_initial)
   return(path)
+
+# Get atom's cip_code
+def GetAtomCip_py(smi, atom_idx_list):
+  mol = Chem.MolFromSmiles(smi)
+  cip_list = []
+  for atom_idx in atom_idx_list:
+    atom = mol.GetAtomWithIdx(atom_idx)
+    if(atom.HasProp('_CIPCode')):
+      cip_list.append(atom.GetProp("_CIPCode"))
+    else:
+      cip_list.append("")
+  return(cip_list)

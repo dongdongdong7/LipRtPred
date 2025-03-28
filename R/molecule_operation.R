@@ -91,3 +91,12 @@
                       start_atom_idx = as.integer(start_atom_idx),
                       non_traversable_atom_idx = as.list(as.integer(non_traversable_atom_idx)))
 }
+
+# Get atom's cip_code
+# .GetAtomCip(smi = "O=C([C@H]1[C@H](O)[C@H](O)[C@@H](O)CO1)O",
+#             atom_idx_vector = c(7, 5, 2, 1, 10),
+#             scriptPath = system.file("python", "molecule_operation.py", package = "LipRtPred"))
+.GetAtomCip <- function(smi, atom_idx_vector, scriptPath){
+  reticulate::source_python(scriptPath)
+  GetAtomCip_py(smi = smi, atom_idx_list = as.list(as.integer(atom_idx_vector)))
+}
