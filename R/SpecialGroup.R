@@ -28,7 +28,7 @@
 #               scriptPath = system.file("python", "molecule_operation.py", package = "LipRtPred"))
 .searchHexose <- function(smi, scriptPath){
   .GetSubstructMatches(smis = smi,
-                       SMARTS = "[CH3,C&$(C-O)&!$(C=O)]C1C([O,N,P,S])C([O,N,P,S])C([O,N,P,S])C([O,N,P,S])O1",
+                       SMARTS = "[CH3,CH2,C&$(C-O)&!$(C=O)]C1C([O,N,P,S])C([O,N,P,S])C([O,N,P,S])C([O,N,P,S])O1",
                        scriptPath = scriptPath)[[1]]
 }
 
@@ -38,7 +38,7 @@
 #                  scriptPath = system.file("python", "molecule_operation.py", package = "LipRtPred"))
 .searchCarnitine <- function(smi, scriptPath){
   .GetSubstructMatches(smis = smi,
-                       SMARTS = "[N+]([CH3])([CH3])([CH3])[CH2][CX4;CH](O)[CH2][CX3](=O)[O-]",
+                       SMARTS = "[N+]([CH3])([CH3])([CH3])[CH2][CX4;CH](O)[CH2][CX3](=O)O",
                        scriptPath = scriptPath)[[1]]
 }
 
@@ -134,7 +134,7 @@
 #             scriptPath = system.file("python", "molecule_operation.py", package = "LipRtPred"))
 .searchDEMA <- function(smi, scriptPath){
   .GetSubstructMatches(smis = smi,
-                       SMARTS = "C(O)CN([CH3])([CH3])",
+                       SMARTS = "C(O)C[NX3]([CH3])([CH3])",
                        scriptPath = scriptPath)[[1]]
 }
 
@@ -154,5 +154,23 @@
 .searchSialicAcid <- function(smi, scriptPath){
   .GetSubstructMatches(smis = smi,
                        SMARTS = "C1(O)C(NC(=O)C)C(C(O)C(O)C(O))OC(O)(C(=O)O)C1",
+                       scriptPath = scriptPath)[[1]]
+}
+
+# 16. Sulfated Galactosyl
+# .searchSulfatedGalactosyl(smi = "O=C(OCC(OC(=O)CCCCC=CCC=CCC=CCC=CCC)COC1OC(CS(=O)(=O)O)C(O)C(O)C1O)CCCCCCCCCCCCCCC",
+#                           scriptPath = system.file("python", "molecule_operation.py", package = "LipRtPred"))
+.searchSulfatedGalactosyl <- function(smi, scriptPath){
+  .GetSubstructMatches(smis = smi,
+                       SMARTS = "S(=O)(=O)(O)CC1C(O)C(O)C(O)C(O)O1",
+                       scriptPath = scriptPath)[[1]]
+}
+
+# 17. Trimethylhomoserine
+# .searchTrimethylhomoserine(smi = "C[C@](CCO)(C(=O)O)N(C)C",
+#                            scriptPath = system.file("python", "molecule_operation.py", package = "LipRtPred"))
+.searchTrimethylhomoserine <- function(smi, scriptPath){
+  .GetSubstructMatches(smis = smi,
+                       SMARTS = "C(=O)(O)C([CH3])([NX3]([CH3])([CH3]))CCO",
                        scriptPath = scriptPath)[[1]]
 }
