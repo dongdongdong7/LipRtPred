@@ -48,7 +48,7 @@
 #                scriptPath = system.file("python", "molecule_operation.py", package = "LipRtPred"))
 .searchCholine <- function(smi, scriptPath){
   .GetSubstructMatches(smis = smi,
-                       SMARTS = "[N+](C)(C)(C)CC[O,P]",
+                       SMARTS = "[N+]([CH3])([CH3])([CH3])[CH2][CH2][O,P]",
                        scriptPath = scriptPath)[[1]]
 }
 
@@ -167,10 +167,10 @@
 }
 
 # 17. Trimethylhomoserine
-# .searchTrimethylhomoserine(smi = "C[C@](CCO)(C(=O)O)N(C)C",
+# .searchTrimethylhomoserine(smi = "O=C(OCC(O)COCCC(C(=O)[O-])[N+](C)(C)C)CCCCCCCC=CCC=CCC=CCC",
 #                            scriptPath = system.file("python", "molecule_operation.py", package = "LipRtPred"))
 .searchTrimethylhomoserine <- function(smi, scriptPath){
   .GetSubstructMatches(smis = smi,
-                       SMARTS = "C(=O)(O)C([CH3])([NX3]([CH3])([CH3]))CCO",
+                       SMARTS = "[N+]([CH3])([CH3])([CH3])C(C(=O)O)CCO",
                        scriptPath = scriptPath)[[1]]
 }

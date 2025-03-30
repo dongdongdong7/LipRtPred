@@ -3,26 +3,6 @@
 # 250327
 
 # system.file("python", "molecule_operation.py", package = "LipRtPred")
-# FA
-# CAR
-# .calCQS_FP(smi = "CCCCCCCCCCCC(=O)OC(CC(O)=O)C[N+](C)(C)C",
-#            scriptPath = system.file("python", "molecule_operation.py", package = "LipRtPred"))
-# .calCQS_FP(smi = "O=C(O)CCCCCCCC=CCCCCCCCC",
-#            scriptPath = system.file("python", "molecule_operation.py", package = "LipRtPred"))
-# .calCQS_FP(smi = "O=C(O)C(O)CCCCCCCCCCCCCCCCCCCC",
-#            scriptPath = system.file("python", "molecule_operation.py", package = "LipRtPred"))
-# .calCQS_FP(smi = "O=C(CC(O)CCCCCC=CCCCC)O",
-#            scriptPath = system.file("python", "molecule_operation.py", package = "LipRtPred"))
-# .calCQS_FP(smi = "C(CCCCCCC(=O)O)CCCCCCC(=O)O",
-#            scriptPath = system.file("python", "molecule_operation.py", package = "LipRtPred"))
-# .calCQS_FP(smi = "O=C(OC(COCCCCCCCCCCCCCCCC)COC1OC(CO)C(O)C(OS(=O)(=O)O)C1O)CCCCCCCCCCCCCCC",
-#            scriptPath = system.file("python", "molecule_operation.py", package = "LipRtPred"))
-# .calCQS_FP(smi = "O=C(OCC(OC(=O)CCCC=CCC=CCC=CCC=CCC=CCC)COC1OC(CO)C(O)C(O)C1O)CCCCCCCC=CCCCCCCCC",
-#            scriptPath = system.file("python", "molecule_operation.py", package = "LipRtPred"))
-# .calCQS_FP(smi = "O=C(OCC(OC(=O)CCCC=CCC=CCC=CCC=CCC=CCC)COC1OC(COC2OC(CO)C(O)C(O)C2O)C(O)C(O)C1O)CCCCCC=CCC=CCC=CCC",
-#            scriptPath = system.file("python", "molecule_operation.py", package = "LipRtPred"))
-# .calCQS_FP(smi = "O=C(OCC(OC(=O)CCCCC=CCC=CCC=CCC=CCC)COC1OC(CS(=O)(=O)O)C(O)C(O)C1O)CCCCCCCCCCCCCCC",
-#            scriptPath = system.file("python", "molecule_operation.py", package = "LipRtPred"))
 # TODO EC_raw4ML 看到了 114
 .calCQS_FP <- function(smi, minimumohNum = 1, scriptPath){
 
