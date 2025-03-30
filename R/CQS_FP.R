@@ -3,7 +3,7 @@
 # 250327
 
 # system.file("python", "molecule_operation.py", package = "LipRtPred")
-# TODO EC_raw4ML 看到了 114
+# TODO EC_raw4ML 看到了 1253 磷酸后加甲基的怎么办
 .calCQS_FP <- function(smi, minimumohNum = 1, scriptPath){
 
   category <- .lipidClassification(smi = smi, scriptPath = scriptPath)
@@ -109,7 +109,7 @@
   remove_position <- unique(unlist(c(glcerol_position, phosphate_position, betaine_position, pentose_position, hexose_position,
                                      choline_position, ethanolamine_position, serine_position, inositol_position, ethanol_position,
                                      threonine_position, carnitine_position, sulfonyl_position, gluacid_position, dema_position,
-                                     mmea_position, sialicAcid_position)))
+                                     mmea_position, sialicAcid_position, sulfatedgalactosyl_position, trimethylhomoserine_position)))
   #if(length(remove_position) != 0) remove_position <- remove_position[.GetAtomSymbol(smi = smi, atom_idx_vector = remove_position, scriptPath = scriptPath) == "C"]
   C_Chains_position <- lapply(C_Chains_position, function(x) {
     x[!x %in% remove_position]

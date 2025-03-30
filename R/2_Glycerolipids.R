@@ -154,10 +154,10 @@
     for(i in 1:length(main_chains)){
       x <- main_chains[[i]]
       if(all(x == "none")) next
-      for(j in (1:length(main_chains))[-i]){
-        y <- main_chains[[j]]
+      for(j in (1:length(glycerol_position))){
+        y <- glycerol_position[[j]]
         if(all(y == "none")) next
-        if(any(y %in% x)) main_chains[[j]] <- "none"
+        if(all(y %in% x)) main_chains[[i]] <- "none"
       }
     }
     main_chains <- lapply(main_chains, function(x){
@@ -165,6 +165,26 @@
       else return(x)
     })
     main_chains <- main_chains[!sapply(main_chains, is.null)]
+  }
+
+  ringsInfo <- .GetRingAtom(smi = smi, scriptPath = scriptPath)
+  if(any(unlist(glycerol_position) %in% unlist(ringsInfo))){
+    if(length(main_chains) != 0){
+      for(i in 1:length(main_chains)){
+        x <- main_chains[[i]]
+        if(all(x == "none")) next
+        for(j in (1:length(main_chains))[-i]){
+          y <- main_chains[[j]]
+          if(all(y == "none")) next
+          if(any(y %in% x)) main_chains[[j]] <- "none"
+        }
+      }
+      main_chains <- lapply(main_chains, function(x){
+        if(all(x == "none")) return(NULL)
+        else return(x)
+      })
+      main_chains <- main_chains[!sapply(main_chains, is.null)]
+    }
   }
 
   c(main_chains, glycerol_position, glycerolEster_position, glycerolEther_position)
