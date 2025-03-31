@@ -12,7 +12,7 @@
     C_Chains_position <- ST_MainChains[names(ST_MainChains) == "sterylEsterChain"]
   }else if(category == "Sphingolipid"){
     SP_MainChains <- .searchSP_MainChains(smi = smi, scriptPath = scriptPath)
-    C_Chains_position <- SP_MainChains[names(SP_MainChains) %in% c("SphEsterChain", "SphAmide_AcylChain")]
+    C_Chains_position <- SP_MainChains[names(SP_MainChains) %in% c("SphEsterChain", "sphingosine_chain", "SphAmide_AcylChain")]
   }else if(category == "Glycerophospholipid" | category == "Glycerolipid"){
     GL_MainChains <- .searchGL_MainChains(smi = smi, scriptPath = scriptPath)
     C_Chains_position <- GL_MainChains[names(GL_MainChains) %in% c("sn1", "sn2", "sn3")]
@@ -118,6 +118,31 @@
     C_Chains_position <- C_Chains_position[sapply(C_Chains_position, function(x) {
       length(which(.GetAtomSymbol(smi = smi, atom_idx_vector = x, scriptPath = scriptPath) == "C"))
     }) > 0]
+  }
+
+  phytosphingosine_position <- .searchPhytosphingosine(smi = smi, scriptPath = scriptPath)
+  phytosphingosineNum <- length(phytosphingosine_position)
+  names(phytosphingosineNum) <- "phytosphingosineNum"
+
+  dihydrosphingosine_position <- .searchDihydrosphingosine(smi = smi, scriptPath = scriptPath)
+  dihydrosphingosineNum <- length(dihydrosphingosine_position)
+  names(dihydrosphingosineNum) <- "dihydrosphingosineNum"
+
+  sphingosine_position <- .searchSphingosine0(smi = smi, scriptPath = scriptPath)
+  sphingosineNum <- length(sphingosine_position)
+  names(sphingosineNum) <- "sphingosineNum"
+
+  sphPosi <- unique(unlist(c(phytosphingosine_position, dihydrosphingosine_position, sphingosine_position)))
+  if(length(sphPosi) != 0){
+    sphPosi <- sphPosi[.GetAtomSymbol(smi = smi, atom_idx_vector = sphPosi, scriptPath = scriptPath) != "C"]
+    C_Chains_position <- lapply(C_Chains_position, function(x) {
+      x[!x %in% sphPosi]
+    })
+    if(length(C_Chains_position) > 0){
+      C_Chains_position <- C_Chains_position[sapply(C_Chains_position, function(x) {
+        length(which(.GetAtomSymbol(smi = smi, atom_idx_vector = x, scriptPath = scriptPath) == "C"))
+      }) > 0]
+    }
   }
 
   # Common group
@@ -249,18 +274,6 @@
   names(sn2Num) <- "sn2Num"
   names(sn3Num) <- "sn3Num"
 
-  phytosphingosine_position <- .searchPhytosphingosine(smi = smi, scriptPath = scriptPath)
-  phytosphingosineNum <- length(phytosphingosine_position)
-  names(phytosphingosineNum) <- "phytosphingosineNum"
-
-  dihydrosphingosine_position <- .searchDihydrosphingosine(smi = smi, scriptPath = scriptPath)
-  dihydrosphingosineNum <- length(dihydrosphingosine_position)
-  names(dihydrosphingosineNum) <- "dihydrosphingosineNum"
-
-  sphingosine_position <- .searchSphingosine0(smi = smi, scriptPath = scriptPath)
-  sphingosineNum <- length(sphingosine_position)
-  names(sphingosineNum) <- "sphingosineNum"
-
   cholesterol_position <- .searchCholestanol(smi = smi, scriptPath = scriptPath)
   cholesterolNum <- length(cholesterol_position)
   names(cholesterolNum) <- "cholesterolNum"
@@ -313,7 +326,7 @@
 #                         scriptPath = system.file("python", "molecule_operation.py", package = "LipRtPred"))
 .searchPhytosphingosine <- function(smi, scriptPath){
   .GetSubstructMatches(smis = smi,
-                       SMARTS = "C(O)C(N)C(O)C(O)CCCCCCCCCCCCC[CH3]",
+                       SMARTS = "[CH2](O)[CX4;CH](N)[CX4;CH](O)[CX4;CH](O)", # [CH2](O)[CX4;CH](N)[CX4;CH](O)[CX4;CH](O)CCCCCCCCCCCCC[CH3]
                        scriptPath = scriptPath)[[1]]
 }
 
@@ -322,7 +335,7 @@
 #                           scriptPath = system.file("python", "molecule_operation.py", package = "LipRtPred"))
 .searchDihydrosphingosine <- function(smi, scriptPath){
   .GetSubstructMatches(smis = smi,
-                       SMARTS = "C(O)C(N)C(O)[CH2]CCCCCCCCCCCCC[CH3]",
+                       SMARTS = "[CH2](O)[CX4;CH](N)[CX4;CH](O)[CX4;CH2]",
                        scriptPath = scriptPath)[[1]]
 }
 
@@ -331,7 +344,7 @@
 #                     scriptPath = system.file("python", "molecule_operation.py", package = "LipRtPred"))
 .searchSphingosine0 <- function(smi, scriptPath){
   .GetSubstructMatches(smis = smi,
-                       SMARTS = "C(O)C(N)C(O)C=CCCCCCCCCCCCC[CH3]",
+                       SMARTS = "[CH2](O)[CX4;CH](N)[CX4;CH](O)C=C",
                        scriptPath = scriptPath)[[1]]
 }
 
