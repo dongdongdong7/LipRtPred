@@ -3,7 +3,7 @@
 # 250327
 
 # system.file("python", "molecule_operation.py", package = "LipRtPred")
-# TODO EC_raw4ML 看到了 1253 磷酸后加甲基的怎么办
+# TODO EC_raw4ML 看到了 1253 磷酸后加甲基的怎么办 1515 胆固醇多了个甲基 1536 一个不认识的结构 1537 多了脂质链
 .calCQS_FP <- function(smi, minimumohNum = 1, scriptPath){
 
   category <- .lipidClassification(smi = smi, scriptPath = scriptPath)
@@ -274,7 +274,7 @@
   names(sn2Num) <- "sn2Num"
   names(sn3Num) <- "sn3Num"
 
-  cholesterol_position <- .searchCholestanol(smi = smi, scriptPath = scriptPath)
+  cholesterol_position <- .searchCholesterol(smi = smi, scriptPath = scriptPath)
   cholesterolNum <- length(cholesterol_position)
   names(cholesterolNum) <- "cholesterolNum"
 
