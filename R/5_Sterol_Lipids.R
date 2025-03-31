@@ -152,6 +152,24 @@
   secoSkC_position <- .searchSecosteroidSkeleton_Chain(smi = smi, scriptPath = scriptPath)
   names(secoSkC_position) <- rep("secoSkC", length(secoSkC_position))
 
+  o <- .searchAcyloxy_AcylChain(smi = smi, scriptPath = scriptPath)
+  if(length(o) != 0 & length(steroidSkD_position) != 0){
+    for(i in 1:length(o)){
+      x <- o[[i]]
+      for(j in 1:length(steroidSkD_position)){
+        y <- steroidSkD_position[[j]]
+        if(all(x %in% y)){
+          steroidSkD_position[[j]] <- steroidSkD_position[[j]][!y %in% x]
+        }else{
+          o[[i]] <- "none"
+        }
+      }
+    }
+    o <- o[!sapply(o, function(x) {all(x == "none")})]
+  }
+  names(o) <- rep("sterylEsterChain", length(o))
+  sterylEsterChain_position <- c(sterylEsterChain_position, o)
+
   c(steroidSk_position, sterylEster_position, sterylEsterChain_position, steroidSkD_position, steroidSkC_position,
     secoSk_position, secoSkD_position, secoSkC_position)
 }
