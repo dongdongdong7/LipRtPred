@@ -18,7 +18,7 @@
 .searchSphingosine <- function(smi, scriptPath){
   # sphingosine
   position <- .GetSubstructMatches(smis = smi,
-                                   SMARTS = "C(O)C(N)[C;$(C-O),$(C=O)](~[O;$(O-C),$(O=C)])[C;$(C-C),$(C=C),$(C#C)]~C",
+                                   SMARTS = "C(O)C([NX3;NH,NH2])[C;$(C-O),$(C=O)](~[O;$(O-C),$(O=C)])[C;$(C-C),$(C=C),$(C#C)]~C",
                                    scriptPath = scriptPath)[[1]]
   names(position) <- rep("sphingosine", length(position))
   if(length(position) == 0){
