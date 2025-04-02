@@ -3,7 +3,7 @@
 # 250327
 
 # system.file("python", "molecule_operation.py", package = "LipRtPred")
-# TODO EC_raw4ML 看到了 1253 磷酸后加甲基的怎么办 1515 胆固醇多了个甲基 1536 一个不认识的结构 1537 多了脂质链
+# TODO EC_raw4ML 看到了 1253 磷酸后加甲基的怎么办 1515 胆固醇多了个甲基 1536 一个不认识的结构
 .calCQS_FP <- function(smi, minimumohNum = 1, scriptPath){
 
   category <- .lipidClassification(smi = smi, scriptPath = scriptPath)
@@ -410,4 +410,51 @@
   .GetSubstructMatches(smis = smi,
                        SMARTS = "C1(O)CCC2(C)C3CCC4(C)C(C(C)CCCC(C)C)CCC4C3CCC2C1",
                        scriptPath = scriptPath)[[1]]
+}
+# .getCQSFP(cmpDf = cmpDf_demo2)
+.getCQSFP <- function(cmpDf, minimumohNum = 1, thread = 1){
+  if(any(is.na(cmpDf$smiles))){
+    na_idx <- which(is.na(cmpDf$smiles))
+    stop(paste0("cmpDf[", na_idx, ", ] has NA smiles!"))
+  }
+  wrong_idx <- .check_smiles(smiles = cmpDf$smiles)
+  if(length(wrong_idx) != 0){
+    message(paste0("Wrong Idx: ", paste0(wrong_idx, collapse = " ")))
+    cmpDf <- cmpDf[-wrong_idx, ]
+  }
+  message("Calculate CQS FP...")
+  smis <- cmpDf$smiles
+  scriptPath <- system.file("python", "molecule_operation.py", package = "LipRtPred")
+  pb <- utils::txtProgressBar(max = length(smis), style = 3)
+  progress <- function(n){utils::setTxtProgressBar(pb, n)}
+  opts <- list(progress = progress)
+  cl <- snow::makeCluster(thread)
+  doSNOW::registerDoSNOW(cl)
+  #parallel::clusterExport(cl, c(".calCQS_FP"), envir = environment())
+  fpsList <- foreach::`%dopar%`(foreach::foreach(smi = smis, n = 1:length(smis),
+                                                 .packages = c(),
+                                                 .export = c(".calCQS_FP"),
+                                                 .options.snow = opts),
+                                {
+                                  CQS <- .calCQS_FP(smi = smi, minimumohNum = minimumohNum, scriptPath = scriptPath)
+                                  CQSDF <- data.frame(matrix(CQS, nrow = 1))
+                                  colnames(CQSDF) <- names(CQS)
+                                  return(CQSDF)
+                                })
+  snow::stopCluster(cl)
+  gc()
+  fpsDf <- purrr::list_rbind(fpsList)
+  return(dplyr::as_tibble(cbind(cmpDf, fpsDf)))
+}
+
+#' @rdname getMD
+#' @param minimumohNum minimum number of OH to be taken into account when calculating the OH distance
+#' @export
+#'
+#' @examples
+#' fpsDf <- GetCQS_FP(cmpDf = cmpDf_demo2, thread = 1)
+GetCQS_FP <- function(cmpDf, flavor = "CxSmiles", minimumohNum = 1, thread = 1){
+  cmpDf$smiles <- .convertSMILES(smiles = cmpDf$smiles, flavor = flavor)
+  fpsDf <- .getCQSFP(cmpDf = cmpDf, minimumohNum = minimumohNum, thread = thread)
+  return(fpsDf)
 }

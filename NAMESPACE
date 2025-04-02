@@ -3,6 +3,7 @@
 export("%>%")
 export(GetAp_FP)
 export(GetCDK_MD)
+export(GetCQS_FP)
 export(GetFMorgan_FP)
 export(GetMaccs_FP)
 export(GetMordred_MD)
