@@ -13,6 +13,8 @@ evaluate_model(testingDf, model, digits = 3)
 \item{testingDf}{A testing data frame.}
 
 \item{model}{Model list.}
+
+\item{digits}{integer indicating the number of decimal places (round) or significant digits (signif) to be used}
 }
 \description{
 Evaluate model.
