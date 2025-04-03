@@ -36,6 +36,8 @@ fpsDf <- GetAp_FP(cmpDf = cmpDf_demo2, thread = 1)
 fpsDf <- GetTt_FP(cmpDf = cmpDf_demo2, thread = 1)
 # MACCS Keys
 fpsDf <- GetMaccs_FP(cmpDf = cmpDf_demo2, thread = 1)
+# CQS
+fpsDf <- GetCQS_FP(cmpDf = cmpDf_demp2, thread = 3)
 ```
 
 ## Build machine learning model
@@ -43,7 +45,6 @@ fpsDf <- GetMaccs_FP(cmpDf = cmpDf_demo2, thread = 1)
 ### Preprocess raw data
 
 ```R
-parallelEnv() # prepare parallel environment for caret package.
 inputDf <- filterColumns(inputDf = descsDf)
 tmp <- split_data(inputDf = inputDf, percentage = 0.8)
 trainingDf <- tmp$training
