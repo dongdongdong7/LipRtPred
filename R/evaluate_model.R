@@ -17,9 +17,16 @@
 predictRt <- function(testingDf, model){
   x <- testingDf[, !colnames(testingDf) %in% c("id", "smiles", "rt")]
   y <- testingDf[, colnames(testingDf) %in% c("id", "smiles", "rt")]
-  prd <- data.frame(stats::predict(model, x))
-  colnames(prd) <- "rt_pred"
-  return(dplyr::as_tibble(cbind(y, prd)))
+  res <- stats::predict(model, x) # predcit return a numeric
+
+  prd <- rep(NA, nrow(y))
+  prd[as.integer(names(res))] <- res
+
+  prdDf <- data.frame(prd)
+  colnames(prdDf) <- "rt_pred"
+  resDf <- dplyr::as_tibble(cbind(y, prdDf)) %>%
+    dplyr::filter(!is.na(rt_pred))
+  return(resDf)
 }
 #' @rdname evaluate_model
 #' @param digits integer indicating the number of decimal places (round) or significant digits (signif) to be used
