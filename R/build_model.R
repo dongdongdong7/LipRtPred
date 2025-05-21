@@ -151,3 +151,43 @@ build_brnn <- function(trainingDf, k = 10, percentage = 0.8, seed = 1,
   gc()
   return(model_brnn)
 }
+#' @rdname build_model
+#' @export
+#'
+#' @examples
+#' model_glmnet <- build_glmnet(trainingDf = trainingDf)
+build_glmnet <- function(trainingDf, k = 10, percentage = 0.8, seed = 1,
+                         search = "random", grid = NULL, metric = "Rsquared",
+                         thread = 1){
+  cv.ctrl <- caret::trainControl(method = "cv", number = k, p = percentage,
+                                 search = search,
+                                 verboseIter = TRUE,
+                                 allowParallel = TRUE)
+  message("Building Elastic Net...")
+  x <- trainingDf[, !colnames(trainingDf) %in% c("id", "smiles")]
+  cl <- snow::makeCluster(thread)
+  doSNOW::registerDoSNOW(cl)
+  if(search == "grid"){
+    if(is.null(grid)){
+      tune.grid <- base::expand.grid(
+        alpha = seq(0, 1, by = 0.1),
+        lambda = 10^seq(-3, 3, length = 100)
+      )
+    }else tune.grid <- grid
+    set.seed(seed)
+    model_glmnet <- caret::train(rt ~ ., data = x,
+                                 method = "glmnet",
+                                 trControl = cv.ctrl,
+                                 metric = metric,
+                                 tuneGrid = tune.grid)
+  }else if(search == "random"){
+    set.seed(seed)
+    model_glmnet <- caret::train(rt ~ ., data = x,
+                                 method = "glmnet",
+                                 trControl = cv.ctrl,
+                                 metric = metric)
+  }
+  snow::stopCluster(cl)
+  gc()
+  return(model_glmnet)
+}

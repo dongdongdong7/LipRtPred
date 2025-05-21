@@ -4,6 +4,7 @@
 \alias{build_rf}
 \alias{build_xgb}
 \alias{build_brnn}
+\alias{build_glmnet}
 \title{Build RT prediction model}
 \usage{
 build_rf(
@@ -29,6 +30,17 @@ build_xgb(
 )
 
 build_brnn(
+  trainingDf,
+  k = 10,
+  percentage = 0.8,
+  seed = 1,
+  search = "random",
+  grid = NULL,
+  metric = "Rsquared",
+  thread = 1
+)
+
+build_glmnet(
   trainingDf,
   k = 10,
   percentage = 0.8,
@@ -70,4 +82,5 @@ For more information about parameters, please refer to \code{\link[caret]{train}
 model_rf <- build_rf(trainingDf = trainingDf)
 model_xgb <- build_xgb(trainingDf = trainingDf)
 model_brnn <- build_brnn(trainingDf = trainingDf)
+model_glmnet <- build_glmnet(trainingDf = trainingDf)
 }

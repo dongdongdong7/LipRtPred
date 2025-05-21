@@ -18,9 +18,12 @@ predictRt <- function(testingDf, model){
   x <- testingDf[, !colnames(testingDf) %in% c("id", "smiles", "rt")]
   y <- testingDf[, colnames(testingDf) %in% c("id", "smiles", "rt")]
   res <- stats::predict(model, x) # predcit return a numeric
-
-  prd <- rep(NA, nrow(y))
-  prd[as.integer(names(res))] <- res
+  if(length(res) == nrow(x)){
+    prd <- res
+  }else{
+    prd <- rep(NA, nrow(y))
+    prd[as.integer(names(res))] <- res
+  }
 
   prdDf <- data.frame(prd)
   colnames(prdDf) <- "rt_pred"
