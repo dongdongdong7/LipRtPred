@@ -107,7 +107,7 @@
 #                    repl = "NS(=O)(=O)c1cccc2c(N(CC)CC)cccc12",
 #                    replaceAll = TRUE,
 #                    scriptPath = system.file("python", "molecule_operation.py", package = "LipRtPred"))
-.ReplaceSubstrusts <- function(smis, patt, repl, replaceAll = TRUE, scriptPath){
+.ReplaceSubstructs <- function(smis, patt, repl, replaceAll = TRUE, scriptPath){
   reticulate::source_python(scriptPath)
-  ReplaceSubstructs_py(smis = smis, patt = patt, repl = repl, replaceAll = replaceAll)
+  ReplaceSubstructs_py(smis = as.list(smis), patt = patt, repl = repl, replaceAll = replaceAll)
 }
