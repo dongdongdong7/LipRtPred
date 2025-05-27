@@ -100,3 +100,14 @@
   reticulate::source_python(scriptPath)
   GetAtomCip_py(smi = smi, atom_idx_list = as.list(as.integer(atom_idx_vector)))
 }
+
+# Replace substructs
+# .ReplaceSubstrusts(smis = c("NC1=CC=CC(C(O)=O)=C1O", "NC1=CC=CC(C(O)=O)=C1O"),
+#                    patt = "[NX3;NH2,NH;!$(N-[C;$(C=*)])]",
+#                    repl = "NS(=O)(=O)c1cccc2c(N(CC)CC)cccc12",
+#                    replaceAll = TRUE,
+#                    scriptPath = system.file("python", "molecule_operation.py", package = "LipRtPred"))
+.ReplaceSubstrusts <- function(smis, patt, repl, replaceAll = TRUE, scriptPath){
+  reticulate::source_python(scriptPath)
+  ReplaceSubstructs_py(smis = smis, patt = patt, repl = repl, replaceAll = replaceAll)
+}

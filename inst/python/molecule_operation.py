@@ -153,3 +153,18 @@ def GetAtomCip_py(smi, atom_idx_list):
     else:
       cip_list.append("")
   return(cip_list)
+
+# Replace substructs
+def ReplaceSubstructs_py(smis, patt, repl, replaceAll = True):
+  patt_mol = Chem.MolFromSmarts(patt)
+  repl_mol = Chem.MolFromSmiles(repl)
+  mols = []
+  for smi in smis:
+    mol = Chem.MolFromSmiles(smi)
+    mols.append(mol)
+  replace_smis = []
+  for mol in mols:
+    rms = AllChem.ReplaceSubstructs(mol, patt_mol, repl_mol, replaceAll = replaceAll)
+    smi = Chem.MolToSmiles(rms[0])
+    replace_smis.append(smi)
+  return(replace_smis)
