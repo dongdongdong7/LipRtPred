@@ -79,7 +79,7 @@ build_xgb <- function(trainingDf, k = 10, percentage = 0.8, seed = 1,
   doSNOW::registerDoSNOW(cl)
   x <- trainingDf[, !colnames(trainingDf) %in% c("id", "smiles")]
   if(search == "grid" & is.null(grid)){
-    if(is.null(gird)){
+    if(is.null(grid)){
       # Use xgb.grid from Retip
       grid <- base::expand.grid(
         nrounds = c(300, 400, 500, 600, 700, 800, 1000),
