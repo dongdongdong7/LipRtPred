@@ -13,4 +13,6 @@ RoxygenNote: 7.3.2
 Depends: 
     R (>= 2.10)
 Imports: 
-    magrittr
+    magrittr,
+    rcdk (>= 3.8.1),
+    reticulate (>= 1.44.0)

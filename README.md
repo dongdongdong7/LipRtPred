@@ -2,6 +2,17 @@
 
 This is an R package to predict lipid retention time. User can use this package to calculate three types of molecule descriptors and six types of molecule fingerprints.
 
+## Download
+
+Please install miniconda before use this package.
+
+```R
+# install.packages("rcdk")
+# install.packages("reticulate")
+# options(timeout = 600)
+devtools::install_github("dongdongdong7/LipRtPred")
+```
+
 ## Load demo data
 
 This demo data is subset of LipidMaps database.
